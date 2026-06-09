@@ -38,48 +38,52 @@ async function handleAIRequest(req, res) {
     // Log body keys to see what's being sent
     console.log(`[IA Request] Body keys: ${Object.keys(req.body || {})}`);
 
-    try {
-        // 1. Intentar Gemini primero (con reintentos en diferentes modelos si falla el 404)
-        if (geminiKey) {
-            console.log("Intentando con Google Gemini (flash-latest)...");
+    // 1. Intentar Gemini primero (con reintentos en diferentes modelos)
+    if (geminiKey) {
+        console.log("Intentando con Google Gemini...");
+        try {
+            const geminiResult = await callGemini(req.body, geminiKey, 'gemini-1.5-flash-latest');
+            return res.json(geminiResult);
+        } catch (err1) {
+            console.warn(`Gemini principal falló: ${err1.message}. Intentando respaldo Gemini...`);
             try {
-                const geminiResult = await callGemini(req.body, geminiKey, 'gemini-1.5-flash-latest');
-                return res.json(geminiResult);
-            } catch (err1) {
-                console.warn(`Gemini-1.5-flash-latest falló: ${err1.message}`);
-                console.log("Intentando con Google Gemini (pro-latest) como respaldo...");
-                const geminiResult = await callGemini(req.body, geminiKey, 'gemini-1.5-pro-latest');
-                return res.json(geminiResult);
+                const geminiResultPro = await callGemini(req.body, geminiKey, 'gemini-1.5-pro-latest');
+                return res.json(geminiResultPro);
+            } catch (errPro) {
+                console.warn(`Todos los modelos de Gemini fallaron: ${errPro.message}`);
             }
-        } else {
-            throw new Error("No hay clave de Gemini (GEMINI_API_KEY).");
-        }
-    } catch (geminiError) {
-        console.warn(`Todos los intentos de Gemini fallaron: ${geminiError.message}`);
-
-        // 2. Fallback a Groq (Llama 3) si está disponible
-        if (groqKey) {
-            console.log("Fallback: Intentando con Groq (Llama 3)...");
-            try {
-                const grokResult = await callGroq(req.body, groqKey);
-                return res.json(grokResult);
-            } catch (groqError) {
-                console.error(`Groq también falló (Clave inválida?): ${groqError.message}`);
-                return res.status(500).json({ error: { message: `Falla Total. Gemini: ${geminiError.message} | Groq: ${groqError.message}. Verifica tus claves de API en Render.` } });
-            }
-        } else if (xaiKey) {
-            console.log("Fallback: Intentando con xAI (Grok)...");
-            try {
-                const grokResult = await callGrok(req.body, xaiKey);
-                return res.json(grokResult);
-            } catch (xaiError) {
-                console.error(`Grok también falló: ${xaiError.message}`);
-                return res.status(500).json({ error: { message: `Falla Total. Gemini: ${geminiError.message} | xAI: ${xaiError.message}` } });
-            }
-        } else {
-            return res.status(500).json({ error: { message: `Gemini falló y no hay claves de respaldo (GROQ_API_KEY o XAI_API_KEY) configuradas. Error: ${geminiError.message}` } });
         }
     }
+
+    // 2. Fallback a Groq (si existe clave)
+    if (groqKey) {
+        console.log("Intentando con Groq (Llama 3)...");
+        try {
+            const groqResult = await callGroq(req.body, groqKey);
+            return res.json(groqResult);
+        } catch (groqError) {
+            console.error(`Groq falló: ${groqError.message}`);
+        }
+    }
+
+    // 3. Fallback a xAI (Grok) - EL QUE USA EL USUARIO
+    if (xaiKey) {
+        console.log("Intentando con xAI (Grok)...");
+        try {
+            const xaiResult = await callGrok(req.body, xaiKey);
+            return res.json(xaiResult);
+        } catch (xaiError) {
+            console.error(`xAI (Grok) falló: ${xaiError.message}`);
+            return res.status(500).json({
+                error: {
+                    message: "Todas las IAs fallaron.",
+                    details: `xAI Error: ${xaiError.message}`
+                }
+            });
+        }
+    }
+
+    return res.status(500).json({ error: { message: "No fue posible obtener una respuesta de ninguna IA." } });
 }
 
 /**
