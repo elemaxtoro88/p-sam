@@ -29,7 +29,7 @@ app.post('/api/analyze', (req, res) => {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'Content-Length': data.length
+            'Content-Length': Buffer.byteLength(data)
         }
     }, (apiRes) => {
         let body = '';
