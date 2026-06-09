@@ -214,6 +214,13 @@ async function analyzeSingle(button) {
             })
         });
 
+        const contentType = resp.headers.get("content-type");
+        if (!contentType || !contentType.includes("application/json")) {
+            const raw = await resp.text();
+            console.error("[Analyze] Non-JSON response:", raw.substring(0, 200));
+            throw new Error(`El servidor devolvió un error inesperado (E${resp.status}). Revisa que el servidor esté actualizado.`);
+        }
+
         const data = await resp.json();
         console.log('[Analyze] Response data:', data);
 
