@@ -71,7 +71,8 @@ async function handleAIRequest(req, res) {
 function callGemini(body, key) {
     return new Promise((resolve, reject) => {
         const model = 'gemini-1.5-flash';
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`;
+        // Using v1 instead of v1beta for better stability
+        const url = `https://generativelanguage.googleapis.com/v1/models/${model}:generateContent?key=${key}`;
         const data = JSON.stringify(body);
 
         const req = https.request(url, {
@@ -139,7 +140,9 @@ function callGrok(geminiStyleBody, key) {
                 try {
                     const parsed = JSON.parse(resBody);
                     if (res.statusCode !== 200) {
-                        return reject(new Error(parsed.error?.message || "Error en xAI API"));
+                        const errorDetail = parsed.error?.message || JSON.stringify(parsed.error) || "Error en xAI API";
+                        console.error(`Grok API Status ${res.statusCode}:`, errorDetail);
+                        return reject(new Error(errorDetail));
                     }
                     const content = parsed.choices?.[0]?.message?.content || "";
                     if (!content) return reject(new Error("Grok devolvió una respuesta vacía"));
