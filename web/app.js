@@ -254,6 +254,10 @@ async function analyzeSingle(button) {
         showToast('✅ Feedback recibido', 'success');
     } catch (err) {
         console.error('API Error:', err);
+        if (feedbackEl) {
+            feedbackEl.innerHTML = `<div class="feedback-badge" style="color:var(--error)">⚠️ Error</div>Hubo un problema al analizar tu respuesta: ${err.message}. Por favor, verifica que el servidor esté funcionando correctamente.`;
+            feedbackEl.className = 'qa-feedback improve has-feedback show';
+        }
         showToast('Error: ' + err.message, 'error');
     } finally {
         button.disabled = false;
@@ -308,6 +312,10 @@ async function analyzeReflections() {
         }
 
         const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+        if (!text) {
+            console.error("Bulk Analyze: No text in response. Data:", data);
+            throw new Error("La IA no devolvió una respuesta para el análisis masivo.");
+        }
         parseFeedback(text, cards);
         showToast('✅ Análisis completado', 'success');
 
@@ -369,7 +377,7 @@ async function runSimulator() {
     btn.disabled = true;
     btn.innerHTML = '<span class="spinner"></span>&nbsp;Simulando...';
     result.className = 'simulator-result';
-    result.style.display = 'none';
+    // Removed result.style.display = 'none' to avoid overriding CSS "show" class
 
     try {
         const resp = await fetch('/api/simulate', {
@@ -416,6 +424,8 @@ Responde en español, de forma motivadora y respetuosa.`
 
     } catch (err) {
         console.error('Simulator Error:', err);
+        result.innerHTML = `<span class="material-symbols-outlined" style="color:var(--error); vertical-align:text-bottom;">error</span> <strong>Error:</strong> ${err.message}`;
+        result.className = 'simulator-result error show'; // Use error class
         showToast('Error en simulador: ' + err.message, 'error');
     } finally {
         btn.disabled = false;
