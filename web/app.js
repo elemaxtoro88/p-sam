@@ -148,12 +148,9 @@ async function analyzeReflections() {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                system_instruction: {
-                    parts: { text: SYSTEM_PROMPT }
-                },
                 contents: [{
                     parts: [{
-                        text: `Analiza las siguientes respuestas de un alumno sobre Gestión del Tiempo. Para cada pregunta, da feedback breve (máximo 3 oraciones). Usa el marcador ✅ EXCELENTE, ⚠️ AMPLIAR o 💡 SUGERENCIA al inicio de cada feedback:\n${allAnswers}`
+                        text: `${SYSTEM_PROMPT}\n\nAnaliza las siguientes respuestas de un alumno sobre Gestión del Tiempo. Para cada pregunta, da feedback breve (máximo 3 oraciones). Usa el marcador ✅ EXCELENTE, ⚠️ AMPLIAR o 💡 SUGERENCIA al inicio de cada feedback:\n${allAnswers}`
                     }]
                 }],
                 generationConfig: {
