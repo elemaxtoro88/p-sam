@@ -1,16 +1,17 @@
 #!/bin/bash
-echo "Iniciando inyección de API Key..."
+# Proyecto Desafíos - Build Script
+# No se requiere inyección de claves en el cliente ya que usamos un proxy en el servidor.
+echo "Verificando estructura del proyecto..."
 
-# Busca app.js en la raíz o en la carpeta web/ y reemplaza la clave
-if [ -f "web/app.js" ]; then
-    sed -i "s/REPLACE_WITH_GEMINI_API_KEY/$GEMINI_API_KEY/g" web/app.js
-    echo "Clave inyectada en web/app.js"
-elif [ -f "app.js" ]; then
-    sed -i "s/REPLACE_WITH_GEMINI_API_KEY/$GEMINI_API_KEY/g" app.js
-    echo "Clave inyectada en app.js"
-else
-    echo "ERROR: No se encontró app.js"
+if [ ! -d "web" ]; then
+    echo "ERROR: La carpeta 'web' no existe."
     exit 1
 fi
 
+if [ ! -f "server.js" ]; then
+    echo "ERROR: No se encontró 'server.js'."
+    exit 1
+fi
+
+echo "Entorno listo para deploy en Render."
 echo "Build completado con éxito."
