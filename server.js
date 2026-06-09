@@ -39,16 +39,23 @@ async function handleAIRequest(req, res) {
     console.log(`[IA Request] Body keys: ${Object.keys(req.body || {})}`);
 
     try {
-        // 1. Intentar Gemini primero
+        // 1. Intentar Gemini primero (con reintentos en diferentes modelos si falla el 404)
         if (geminiKey) {
-            console.log("Intentando con Google Gemini...");
-            const geminiResult = await callGemini(req.body, geminiKey);
-            return res.json(geminiResult);
+            console.log("Intentando con Google Gemini (flash-latest)...");
+            try {
+                const geminiResult = await callGemini(req.body, geminiKey, 'gemini-1.5-flash-latest');
+                return res.json(geminiResult);
+            } catch (err1) {
+                console.warn(`Gemini-1.5-flash-latest falló: ${err1.message}`);
+                console.log("Intentando con Google Gemini (pro-latest) como respaldo...");
+                const geminiResult = await callGemini(req.body, geminiKey, 'gemini-1.5-pro-latest');
+                return res.json(geminiResult);
+            }
         } else {
-            throw new Error("No Gemini Key");
+            throw new Error("No hay clave de Gemini (GEMINI_API_KEY).");
         }
     } catch (geminiError) {
-        console.warn(`Gemini falló o no disponible: ${geminiError.message}`);
+        console.warn(`Todos los intentos de Gemini fallaron: ${geminiError.message}`);
 
         // 2. Fallback a Groq (Llama 3) si está disponible
         if (groqKey) {
@@ -57,8 +64,8 @@ async function handleAIRequest(req, res) {
                 const grokResult = await callGroq(req.body, groqKey);
                 return res.json(grokResult);
             } catch (groqError) {
-                console.error(`Groq también falló: ${groqError.message}`);
-                return res.status(500).json({ error: { message: `Ambas IAs fallaron. Gemini: ${geminiError.message} | Groq: ${groqError.message}` } });
+                console.error(`Groq también falló (Clave inválida?): ${groqError.message}`);
+                return res.status(500).json({ error: { message: `Falla Total. Gemini: ${geminiError.message} | Groq: ${groqError.message}. Verifica tus claves de API en Render.` } });
             }
         } else if (xaiKey) {
             console.log("Fallback: Intentando con xAI (Grok)...");
@@ -67,10 +74,10 @@ async function handleAIRequest(req, res) {
                 return res.json(grokResult);
             } catch (xaiError) {
                 console.error(`Grok también falló: ${xaiError.message}`);
-                return res.status(500).json({ error: { message: `Ambas IAs fallaron. Gemini: ${geminiError.message} | xAI: ${xaiError.message}` } });
+                return res.status(500).json({ error: { message: `Falla Total. Gemini: ${geminiError.message} | xAI: ${xaiError.message}` } });
             }
         } else {
-            return res.status(500).json({ error: { message: `Gemini falló y no hay clave de fallback configurada. Error: ${geminiError.message}` } });
+            return res.status(500).json({ error: { message: `Gemini falló y no hay claves de respaldo (GROQ_API_KEY o XAI_API_KEY) configuradas. Error: ${geminiError.message}` } });
         }
     }
 }
@@ -78,11 +85,10 @@ async function handleAIRequest(req, res) {
 /**
  * Llamada a Google Gemini
  */
-function callGemini(body, key) {
+function callGemini(body, key, model = 'gemini-1.5-flash') {
     return new Promise((resolve, reject) => {
-        const model = 'gemini-1.5-flash';
-        // Using v1 instead of v1beta for better stability
-        const url = `https://generativelanguage.googleapis.com/v1/models/${model}:generateContent?key=${key}`;
+        // Using v1beta for better model coverage
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`;
         const data = JSON.stringify(body);
 
         const req = https.request(url, {
