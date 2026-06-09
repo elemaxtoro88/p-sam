@@ -26,11 +26,12 @@ app.use('/api/*', (req, res) => {
  */
 async function handleAIRequest(req, res) {
     const geminiKey = process.env.GEMINI_API_KEY;
+    const groqKey = process.env.GROQ_API_KEY; // Switching to Groq as in Master Psico
     const xaiKey = process.env.XAI_API_KEY;
 
-    if (!geminiKey && !xaiKey) {
-        console.error("ERROR: No API keys (GEMINI or XAI) configured.");
-        return res.status(500).json({ error: { message: "No API keys configured on server. Set GEMINI_API_KEY or XAI_API_KEY." } });
+    if (!geminiKey && !groqKey && !xaiKey) {
+        console.error("ERROR: No API keys configured.");
+        return res.status(500).json({ error: { message: "No API keys configured on server." } });
     }
 
     console.log(`[IA Request] Endpoint: ${req.url} | Method: ${req.method}`);
@@ -49,18 +50,27 @@ async function handleAIRequest(req, res) {
     } catch (geminiError) {
         console.warn(`Gemini falló o no disponible: ${geminiError.message}`);
 
-        // 2. Fallback a Grok si está disponible
-        if (xaiKey) {
+        // 2. Fallback a Groq (Llama 3) si está disponible
+        if (groqKey) {
+            console.log("Fallback: Intentando con Groq (Llama 3)...");
+            try {
+                const grokResult = await callGroq(req.body, groqKey);
+                return res.json(grokResult);
+            } catch (groqError) {
+                console.error(`Groq también falló: ${groqError.message}`);
+                return res.status(500).json({ error: { message: `Ambas IAs fallaron. Gemini: ${geminiError.message} | Groq: ${groqError.message}` } });
+            }
+        } else if (xaiKey) {
             console.log("Fallback: Intentando con xAI (Grok)...");
             try {
                 const grokResult = await callGrok(req.body, xaiKey);
                 return res.json(grokResult);
             } catch (xaiError) {
                 console.error(`Grok también falló: ${xaiError.message}`);
-                return res.status(500).json({ error: { message: `Ambas IAs fallaron. Gemini: ${geminiError.message} | Grok: ${xaiError.message}` } });
+                return res.status(500).json({ error: { message: `Ambas IAs fallaron. Gemini: ${geminiError.message} | xAI: ${xaiError.message}` } });
             }
         } else {
-            return res.status(500).json({ error: { message: `Gemini falló y no hay clave de xAI para fallback. Error: ${geminiError.message}` } });
+            return res.status(500).json({ error: { message: `Gemini falló y no hay clave de fallback configurada. Error: ${geminiError.message}` } });
         }
     }
 }
@@ -102,6 +112,60 @@ function callGemini(body, key) {
         });
 
         req.on('timeout', () => { req.destroy(); reject(new Error("Timeout en Gemini (10s)")); });
+        req.on('error', e => reject(e));
+        req.write(data);
+        req.end();
+    });
+}
+
+/**
+ * Llamada a Groq (Llama 3) — Como en Master Psico
+ */
+function callGroq(geminiStyleBody, key) {
+    return new Promise((resolve, reject) => {
+        const url = 'https://api.groq.com/openai/v1/chat/completions';
+        const promptText = geminiStyleBody.contents?.[0]?.parts?.[0]?.text || "";
+
+        const data = JSON.stringify({
+            model: 'llama-3.3-70b-versatile',
+            messages: [
+                { role: 'system', content: 'Eres un asistente educativo especializado en Gestión del Tiempo del Proyecto Desafíos.' },
+                { role: 'user', content: promptText }
+            ],
+            temperature: 0.6
+        });
+
+        const req = https.request(url, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${key}`,
+                'Content-Type': 'application/json',
+                'Content-Length': Buffer.byteLength(data)
+            },
+            timeout: 10000
+        }, (res) => {
+            let resBody = '';
+            res.on('data', chunk => resBody += chunk);
+            res.on('end', () => {
+                try {
+                    const parsed = JSON.parse(resBody);
+                    if (res.statusCode !== 200) {
+                        return reject(new Error(parsed.error?.message || "Error en Groq API"));
+                    }
+                    const content = parsed.choices?.[0]?.message?.content || "";
+                    if (!content) return reject(new Error("Groq devolvió una respuesta vacía"));
+
+                    console.log("Groq: Success response received.");
+                    resolve({
+                        candidates: [{ content: { parts: [{ text: content }] } }]
+                    });
+                } catch (e) {
+                    reject(new Error("Error parseando respuesta de Groq"));
+                }
+            });
+        });
+
+        req.on('timeout', () => { req.destroy(); reject(new Error("Timeout en Groq (10s)")); });
         req.on('error', e => reject(e));
         req.write(data);
         req.end();
