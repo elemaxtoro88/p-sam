@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión del Tiempo | Proyecto Desafíos</title>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="styles.css">
+
+    <!-- PDF Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+
+<body>
+
+    <!-- SITE HEADER -->
+    <header class="site-header">
+        <div class="header-inner">
+            <img src="assets/logo.png" alt="Logo Colegio Pedro Goyena" class="header-logo">
+            <h1 class="header-title">Gestión del <span>Tiempo</span></h1>
+
+            <div class="header-fields">
+                <input type="text" id="studentName" class="header-input" placeholder="Nombre completo...">
+                <select id="studentTurno" class="header-select">
+                    <option value="mañana">Mañana</option>
+                    <option value="tarde">Tarde</option>
+                </select>
+            </div>
+
+            <div class="header-actions">
+                <button id="themeToggle" class="btn-icon" title="Cambiar tema">
+                    <span id="themeIcon" class="material-symbols-outlined">dark_mode</span>
+                </button>
+                <button id="pdfBtn" class="btn btn-primary">
+                    <span class="material-symbols-outlined">download</span> Descargar PDF
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <!-- HERO SECTION -->
+        <section class="hero">
+            <div class="hero-inner">
+                <div class="hero-badge">
+                    <span class="material-symbols-outlined">verified</span>
+                    Proyecto Desafíos
+                </div>
+                <h1>Domina tu Tiempo,<br><span>Construye tu Futuro</span></h1>
+                <p>Bienvenido/a, <span id="greetingName">Alumno/a</span>. Esta plataforma te ayudará a organizar tus
+                    días, crear hábitos sólidos y alcanzar tus metas académicas y personales.</p>
+            </div>
+        </section>
+
+        <!-- VIDEO SECTION -->
+        <section class="video-section container">
+            <div class="video-label">Guía de Inicio</div>
+            <p class="video-sublabel">Observa este video para entender la importancia de la autogestión.</p>
+            <div class="video-wrapper">
+                <video controls poster="assets/logo.png">
+                    <source src="assets/video.mp4" type="video/mp4">
+                    Tu navegador no soporta el video.
+                </video>
+            </div>
+        </section>
+
+        <!-- RESUMEN CONTENT (Accordion) -->
+        <section class="section container">
+            <div class="section-title">
+                <span class="material-symbols-outlined card-icon-blue">menu_book</span>
+                Conceptos Fundamentales
+            </div>
+            <p class="section-subtitle">Explora los pilares de la gestión del tiempo basados en nuestro material de
+                estudio.</p>
+
+            <div class="accordion">
+                <button class="accordion-header">
+                    1. La Importancia de la Planificación
+                    <span class="material-symbols-outlined accordion-arrow">expand_more</span>
+                </button>
+                <div class="accordion-body">
+                    <div class="accordion-body-inner">
+                        <div class="summary-card">
+                            <h4><span class="material-symbols-outlined">event_available</span> ¿Por qué planificar?</h4>
+                            <p>Planificar no es solo anotar tareas; es diseñar tu vida. Sin un plan, el tiempo se escapa
+                                en distracciones. Una buena planificación reduce el estrés y aumenta la eficacia.</p>
+                            <ul class="mt-8">
+                                <li>Define metas claras (SMART).</li>
+                                <li>Usa agendas o calendarios digitales.</li>
+                                <li>Desglosa tareas grandes en pasos pequeños.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header">
+                    2. Matriz de Eisenhower (Priorización)
+                    <span class="material-symbols-outlined accordion-arrow">expand_more</span>
+                </button>
+                <div class="accordion-body">
+                    <div class="accordion-body-inner">
+                        <div class="card-grid card-grid-2">
+                            <div class="summary-card orange">
+                                <h4>Urgente e Importante</h4>
+                                <p>Hacerlo ya. Crisis, problemas apremiantes, fechas límite inminentes.</p>
+                            </div>
+                            <div class="summary-card">
+                                <h4>Importante, No Urgente</h4>
+                                <p>Planificar / Agendar. Prevención, construcción de relaciones, nuevas oportunidades.
+                                </p>
+                            </div>
+                            <div class="summary-card purple">
+                                <h4>Urgente, No Importante</h4>
+                                <p>Delegar / Minimizar. Interrupciones, algunas llamadas, correos o reuniones.</p>
+                            </div>
+                            <div class="summary-card green">
+                                <h4>Ni Urgente ni Importante</h4>
+                                <p>Eliminar. Pérdidas de tiempo, distracciones excesivas, redes sociales sin propósito.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header">
+                    3. Hábitos Atómicos (Las 4 Leyes)
+                    <span class="material-symbols-outlined accordion-arrow">expand_more</span>
+                </button>
+                <div class="accordion-body">
+                    <div class="accordion-body-inner">
+                        <p class="mb-16">Basado en James Clear: los pequeños cambios (atómicos) generan grandes
+                            transformaciones.</p>
+                        <div class="card-grid card-grid-2">
+                            <div class="card">
+                                <div class="card-icon card-icon-orange">1</div>
+                                <h3>Hacerlo Obvio</h3>
+                                <p>Diseña tu entorno para que las señales de tus buenos hábitos sean visibles.</p>
+                            </div>
+                            <div class="card">
+                                <div class="card-icon card-icon-orange">2</div>
+                                <h3>Hacerlo Atractivo</h3>
+                                <p>Vincula el hábito que necesitas hacer con una acción que desees hacer.</p>
+                            </div>
+                            <div class="card">
+                                <div class="card-icon card-icon-orange">3</div>
+                                <h3>Hacerlo Sencillo</h3>
+                                <p>Regla de los 2 minutos: empieza con algo tan fácil que no puedas decir que no.</p>
+                            </div>
+                            <div class="card">
+                                <div class="card-icon card-icon-orange">4</div>
+                                <h3>Hacerlo Satisfactorio</h3>
+                                <p>Dátelo a ti mismo: una recompensa inmediata al completar el hábito.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header">
+                    4. Tiempos de Dolor y Facultades
+                    <span class="material-symbols-outlined accordion-arrow">expand_more</span>
+                </button>
+                <div class="accordion-body">
+                    <div class="accordion-body-inner">
+                        <div class="summary-card purple">
+                            <h4>Facultades de la Persona</h4>
+                            <p>Para gestionar el tiempo necesitamos:</p>
+                            <ul>
+                                <li><strong>Inteligencia:</strong> Para conocer y discernir qué es lo mejor.</li>
+                                <li><strong>Voluntad:</strong> Para decidir y ejecutar lo planeado.</li>
+                                <li><strong>Afectividad:</strong> Para integrar nuestras emociones en el proceso.</li>
+                            </ul>
+                        </div>
+                        <div class="summary-card green">
+                            <h4>Aceptar los Tiempos de Dolor</h4>
+                            <p>El crecimiento ocurre en la incomodidad. Aprender a tolerar la frustración cuando algo no
+                                sale a la primera es fundamental para la autogestión.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- GUIA DE ACTIVIDADES (Tabs) -->
+        <section class="section container">
+            <div class="section-title">
+                <span class="material-symbols-outlined card-icon-orange">assignment</span>
+                Guía de Actividades
+            </div>
+            <p class="section-subtitle">Ejercicios prácticos para aplicar hoy mismo.</p>
+
+            <div class="card" data-tabs>
+                <div class="tabs-nav">
+                    <button class="tab-btn active" data-tab="act1">Mi Entorno</button>
+                    <button class="tab-btn" data-tab="act2">Matriz Personal</button>
+                    <button class="tab-btn" data-tab="act3">Hábito Atómico</button>
+                    <button class="tab-btn" data-tab="act4">Ladrones de Tiempo</button>
+                    <button class="tab-btn" data-tab="act5">Mi Motivación</button>
+                </div>
+
+                <div class="tab-content active" data-tab-content="act1">
+                    <label class="activity-label">¿Cómo podés hacer "Obvio" tu espacio de estudio hoy?</label>
+                    <textarea class="activity-textarea"
+                        placeholder="Ej: Poner el libro sobre la almohada..."></textarea>
+                </div>
+                <div class="tab-content" data-tab-content="act2">
+                    <label class="activity-label">Identifica una tarea "Importante pero No Urgente" que estés
+                        postergando.</label>
+                    <textarea class="activity-textarea"
+                        placeholder="Ej: Empezar el proyecto de fin de año..."></textarea>
+                </div>
+                <div class="tab-content" data-tab-content="act3">
+                    <label class="activity-label">Escribe un hábito que quieras empezar y cómo le aplicarías la "Regla
+                        de los 2 minutos".</label>
+                    <textarea class="activity-textarea"
+                        placeholder="Ej: Leer → Leer solo una página cada noche..."></textarea>
+                </div>
+                <div class="tab-content" data-tab-content="act4">
+                    <label class="activity-label">¿Cuál es tu mayor "ladrón de tiempo" (distracción) y qué harás hoy
+                        para evitarlo?</label>
+                    <textarea class="activity-textarea"
+                        placeholder="Ej: Instagram → Dejar el celular en otra habitación..."></textarea>
+                </div>
+                <div class="tab-content" data-tab-content="act5">
+                    <label class="activity-label">¿Cuál es tu principal motivo para querer gestionar mejor tu
+                        tiempo?</label>
+                    <textarea class="activity-textarea"
+                        placeholder="Ej: Tener más tiempo libre para jugar fútbol sin culpa..."></textarea>
+                </div>
+
+                <div class="flex justify-between items-center mt-24">
+                    <div class="flex items-center gap-16">
+                        <svg width="40" height="40" viewBox="0 0 36 36">
+                            <circle cx="18" cy="18" r="16" fill="none" stroke="var(--outline-variant)" stroke-width="4">
+                            </circle>
+                            <circle id="ringActivity" cx="18" cy="18" r="16" fill="none"
+                                stroke="var(--secondary-container)" stroke-width="4" stroke-linecap="round"
+                                class="progress-ring-circle"
+                                style="stroke-dasharray: 100.53; stroke-dashoffset: 100.53;"></circle>
+                        </svg>
+                        <span id="ringActPct" class="font-mono"
+                            style="font-weight: 700; color: var(--secondary-container);">0%</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- QA SECTION -->
+        <section id="grokResults" class="section container">
+            <div class="section-title">
+                <span class="material-symbols-outlined card-icon-purple">psychology</span>
+                Taller de Autogestión
+            </div>
+            <p class="section-subtitle">Reflexiona y recibe feedback personalizado para mejorar tu aprendizaje.</p>
+
+            <div class="card-grid">
+                <!-- Question 1 -->
+                <div class="qa-card">
+                    <div class="qa-num">1</div>
+                    <div class="qa-label">¿Cómo manejas la frustración cuando los tiempos no se cumplen?</div>
+                    <textarea class="qa-textarea" placeholder="Escribí tu reflexión..."></textarea>
+                    <div class="qa-feedback"></div>
+                </div>
+                <!-- Question 2 -->
+                <div class="qa-card">
+                    <div class="qa-num">2</div>
+                    <div class="qa-label">¿Qué dificultades encontraste en el proceso de aprendizaje hoy?</div>
+                    <textarea class="qa-textarea" placeholder="Escribí tu reflexión..."></textarea>
+                    <div class="qa-feedback"></div>
+                </div>
+                <!-- Question 3 -->
+                <div class="qa-card">
+                    <div class="qa-num">3</div>
+                    <div class="qa-label">¿Cómo podrías mejorar tu método de estudio para la siguiente fase?</div>
+                    <textarea class="qa-textarea" placeholder="Escribí tu reflexión..."></textarea>
+                    <div class="qa-feedback"></div>
+                </div>
+            </div>
+
+            <div class="flex justify-between items-center mt-24 flex-wrap gap-16">
+                <div class="flex items-center gap-16">
+                    <svg width="50" height="50" viewBox="0 0 36 36">
+                        <circle cx="18" cy="18" r="16" fill="none" stroke="var(--outline-variant)" stroke-width="4">
+                        </circle>
+                        <circle id="ringProgress" cx="18" cy="18" r="16" fill="none" stroke="var(--primary)"
+                            stroke-width="4" stroke-linecap="round" class="progress-ring-circle"
+                            style="stroke-dasharray: 100.53; stroke-dashoffset: 100.53;"></circle>
+                    </svg>
+                    <div>
+                        <div id="ringPct" class="font-mono"
+                            style="font-size: 1.2rem; font-weight: 800; color: var(--primary);">0%</div>
+                        <div
+                            style="font-size: 0.7rem; color: var(--on-surface-variant); font-weight: 600; text-transform: uppercase;">
+                            Progreso de Sesión</div>
+                    </div>
+                </div>
+
+                <button id="analyzeBtn" class="btn btn-secondary" style="padding: 14px 32px; font-size: 1rem;">
+                    <span class="material-symbols-outlined">psychology</span>
+                    Analizar Reflexiones
+                </button>
+            </div>
+        </section>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="site-footer">
+        <img src="assets/logo.png" alt="Logo Colegio Pedro Goyena" class="footer-logo">
+        <p class="footer-text">© 2026 Colegio Pedro Goyena · Proyecto Desafíos</p>
+        <p class="footer-text" style="opacity: 0.6; font-size: 0.7rem; margin-top: 4px;">Pausa para pensar: El
+            aprendizaje es un viaje, no una carrera.</p>
+    </footer>
+
+    <!-- TOAST -->
+    <div id="toast" class="toast"></div>
+
+    <!-- APP SCRIPT -->
+    <script src="app.js"></script>
+</body>
+
+</html>
