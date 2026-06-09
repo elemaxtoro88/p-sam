@@ -190,6 +190,8 @@ async function analyzeSingle(button) {
         return;
     }
 
+    console.log(`[Analyze] Question: ${label}`);
+
     // UI: loading state
     button.disabled = true;
     const originalHTML = button.innerHTML;
@@ -213,16 +215,21 @@ async function analyzeSingle(button) {
         });
 
         const data = await resp.json();
+        console.log('[Analyze] Response data:', data);
 
         if (!resp.ok) {
-            const errorMsg = data.error?.message || `Error ${resp.status}`;
+            const errorMsg = data.error?.message || data.message || `Error ${resp.status}`;
             throw new Error(errorMsg);
         }
 
-        const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+        const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+
+        if (!text) {
+            throw new Error("La IA no devolvió una respuesta válida. Intentá de nuevo.");
+        }
 
         // Parse and display feedback
-        if (text && feedbackEl) {
+        if (feedbackEl) {
             const cleanFb = text.trim();
             let cls = 'suggest';
             let badge = '💡 Sugerencia';
