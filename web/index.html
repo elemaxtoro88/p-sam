@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestión del Tiempo | Proyecto Desafíos</title>
+    <meta name="description" content="Plataforma educativa interactiva para la gestión del tiempo y construcción de identidad. Proyecto Desafíos - Colegio Pedro Goyena.">
 
     <!-- CSS -->
     <link rel="stylesheet" href="styles.css">
@@ -15,6 +16,16 @@
 
 <body>
 
+    <!-- 3D FLOATING DECORATIONS -->
+    <div class="floating-shapes" aria-hidden="true">
+        <div class="shape shape-1"></div>
+        <div class="shape shape-2"></div>
+        <div class="shape shape-3"></div>
+        <div class="shape shape-4"></div>
+        <div class="shape shape-5"></div>
+        <div class="shape shape-6"></div>
+    </div>
+
     <!-- SITE HEADER -->
     <header class="site-header">
         <div class="header-inner">
@@ -23,6 +34,7 @@
 
             <div class="header-fields">
                 <input type="text" id="studentName" class="header-input" placeholder="Nombre completo...">
+                <input type="text" id="studentCurso" class="header-input header-input-sm" placeholder="Curso...">
                 <select id="studentTurno" class="header-select">
                     <option value="mañana">Mañana</option>
                     <option value="tarde">Tarde</option>
@@ -42,7 +54,8 @@
 
     <main>
         <!-- HERO SECTION -->
-        <section class="hero">
+        <section class="hero reveal-section">
+            <div class="hero-particles" aria-hidden="true"></div>
             <div class="hero-inner">
                 <div class="hero-badge">
                     <span class="material-symbols-outlined">verified</span>
@@ -51,11 +64,25 @@
                 <h1>Domina tu Tiempo,<br><span>Construye tu Futuro</span></h1>
                 <p>Bienvenido/a, <span id="greetingName">Alumno/a</span>. Esta plataforma te ayudará a organizar tus
                     días, crear hábitos sólidos y alcanzar tus metas académicas y personales.</p>
+                <div class="hero-stats">
+                    <div class="hero-stat">
+                        <span class="hero-stat-num">10</span>
+                        <span class="hero-stat-label">Actividades</span>
+                    </div>
+                    <div class="hero-stat">
+                        <span class="hero-stat-num">5</span>
+                        <span class="hero-stat-label">Reflexiones</span>
+                    </div>
+                    <div class="hero-stat">
+                        <span class="hero-stat-num">IA</span>
+                        <span class="hero-stat-label">Feedback</span>
+                    </div>
+                </div>
             </div>
         </section>
 
         <!-- VIDEO SECTION -->
-        <section class="video-section container">
+        <section class="video-section container reveal-section">
             <div class="video-label">Guía de Inicio</div>
             <p class="video-sublabel">Observa este video para entender la importancia de la autogestión.</p>
             <div class="video-wrapper">
@@ -67,7 +94,7 @@
         </section>
 
         <!-- RESUMEN CONTENT (Accordion) -->
-        <section class="section container">
+        <section class="section container reveal-section">
             <div class="section-title">
                 <span class="material-symbols-outlined card-icon-blue">menu_book</span>
                 Conceptos Fundamentales
@@ -110,8 +137,7 @@
                             </div>
                             <div class="summary-card">
                                 <h4>Importante, No Urgente</h4>
-                                <p>Planificar / Agendar. Prevención, construcción de relaciones, nuevas oportunidades.
-                                </p>
+                                <p>Planificar / Agendar. Prevención, construcción de relaciones, nuevas oportunidades.</p>
                             </div>
                             <div class="summary-card purple">
                                 <h4>Urgente, No Importante</h4>
@@ -119,8 +145,7 @@
                             </div>
                             <div class="summary-card green">
                                 <h4>Ni Urgente ni Importante</h4>
-                                <p>Eliminar. Pérdidas de tiempo, distracciones excesivas, redes sociales sin propósito.
-                                </p>
+                                <p>Eliminar. Pérdidas de tiempo, distracciones excesivas, redes sociales sin propósito.</p>
                             </div>
                         </div>
                     </div>
@@ -186,15 +211,57 @@
                     </div>
                 </div>
             </div>
+
+            <div class="accordion">
+                <button class="accordion-header">
+                    5. Identidad y Hábitos
+                    <span class="material-symbols-outlined accordion-arrow">expand_more</span>
+                </button>
+                <div class="accordion-body">
+                    <div class="accordion-body-inner">
+                        <div class="summary-card">
+                            <h4><span class="material-symbols-outlined">person</span> Los 3 niveles de cambio</h4>
+                            <p>Según James Clear, el cambio real ocurre en tres niveles:</p>
+                            <ul class="mt-8">
+                                <li><strong>Resultado:</strong> Lo que obtenés (notas, logros).</li>
+                                <li><strong>Proceso:</strong> Lo que hacés (hábitos, rutinas).</li>
+                                <li><strong>Identidad:</strong> Lo que creés sobre vos mismo. <em>"Soy una persona organizada"</em> vs <em>"Quiero ser organizado"</em>.</li>
+                            </ul>
+                            <p class="mt-8"><strong>Clave:</strong> El cambio más duradero empieza por la identidad. No se trata de tener un objetivo, sino de convertirse en el tipo de persona que logra esos objetivos.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion">
+                <button class="accordion-header">
+                    6. Equilibrio y Metacognición
+                    <span class="material-symbols-outlined accordion-arrow">expand_more</span>
+                </button>
+                <div class="accordion-body">
+                    <div class="accordion-body-inner">
+                        <div class="card-grid card-grid-2">
+                            <div class="summary-card orange">
+                                <h4><span class="material-symbols-outlined">balance</span> Equilibrio vital</h4>
+                                <p>Gestionar el tiempo no es solo producir. Es equilibrar estudio, descanso, relaciones y crecimiento personal. Un buen plan incluye pausas activas y momentos de disfrute.</p>
+                            </div>
+                            <div class="summary-card purple">
+                                <h4><span class="material-symbols-outlined">neurology</span> Metacognición</h4>
+                                <p>"Pensar sobre cómo pensamos". Reflexionar sobre tu propio aprendizaje te permite identificar qué estrategias te funcionan y cuáles no, para ajustar tu método de estudio.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </section>
 
         <!-- GUIA DE ACTIVIDADES (Tabs) -->
-        <section class="section container">
+        <section class="section container reveal-section">
             <div class="section-title">
                 <span class="material-symbols-outlined card-icon-orange">assignment</span>
                 Guía de Actividades
             </div>
-            <p class="section-subtitle">Ejercicios prácticos para aplicar hoy mismo.</p>
+            <p class="section-subtitle">Ejercicios prácticos para aplicar hoy mismo. Completá cada actividad y avanzá en tu autogestión.</p>
 
             <div class="card" data-tabs>
                 <div class="tabs-nav">
@@ -203,36 +270,119 @@
                     <button class="tab-btn" data-tab="act3">Hábito Atómico</button>
                     <button class="tab-btn" data-tab="act4">Ladrones de Tiempo</button>
                     <button class="tab-btn" data-tab="act5">Mi Motivación</button>
+                    <button class="tab-btn" data-tab="act6">Semana Ideal</button>
+                    <button class="tab-btn" data-tab="act7">Metacognición</button>
+                    <button class="tab-btn" data-tab="act8">Carta al Futuro</button>
+                    <button class="tab-btn" data-tab="act9">Identidad</button>
+                    <button class="tab-btn" data-tab="act10">Simulador IA</button>
                 </div>
 
                 <div class="tab-content active" data-tab-content="act1">
-                    <label class="activity-label">¿Cómo podés hacer "Obvio" tu espacio de estudio hoy?</label>
-                    <textarea class="activity-textarea"
-                        placeholder="Ej: Poner el libro sobre la almohada..."></textarea>
+                    <div class="activity-header">
+                        <span class="activity-icon">🏠</span>
+                        <div>
+                            <label class="activity-label">¿Cómo podés hacer "Obvio" tu espacio de estudio hoy?</label>
+                            <p class="activity-hint">Pensá en cómo rediseñar tu entorno para facilitar los buenos hábitos.</p>
+                        </div>
+                    </div>
+                    <textarea class="activity-textarea" placeholder="Ej: Poner el libro sobre la almohada..."></textarea>
                 </div>
                 <div class="tab-content" data-tab-content="act2">
-                    <label class="activity-label">Identifica una tarea "Importante pero No Urgente" que estés
-                        postergando.</label>
-                    <textarea class="activity-textarea"
-                        placeholder="Ej: Empezar el proyecto de fin de año..."></textarea>
+                    <div class="activity-header">
+                        <span class="activity-icon">📊</span>
+                        <div>
+                            <label class="activity-label">Identifica una tarea "Importante pero No Urgente" que estés postergando.</label>
+                            <p class="activity-hint">Usá la Matriz de Eisenhower para clasificar tus pendientes.</p>
+                        </div>
+                    </div>
+                    <textarea class="activity-textarea" placeholder="Ej: Empezar el proyecto de fin de año..."></textarea>
                 </div>
                 <div class="tab-content" data-tab-content="act3">
-                    <label class="activity-label">Escribe un hábito que quieras empezar y cómo le aplicarías la "Regla
-                        de los 2 minutos".</label>
-                    <textarea class="activity-textarea"
-                        placeholder="Ej: Leer → Leer solo una página cada noche..."></textarea>
+                    <div class="activity-header">
+                        <span class="activity-icon">⚡</span>
+                        <div>
+                            <label class="activity-label">Escribe un hábito que quieras empezar y cómo le aplicarías la "Regla de los 2 minutos".</label>
+                            <p class="activity-hint">Reducilo a su versión más simple para no poder decir que no.</p>
+                        </div>
+                    </div>
+                    <textarea class="activity-textarea" placeholder="Ej: Leer → Leer solo una página cada noche..."></textarea>
                 </div>
                 <div class="tab-content" data-tab-content="act4">
-                    <label class="activity-label">¿Cuál es tu mayor "ladrón de tiempo" (distracción) y qué harás hoy
-                        para evitarlo?</label>
-                    <textarea class="activity-textarea"
-                        placeholder="Ej: Instagram → Dejar el celular en otra habitación..."></textarea>
+                    <div class="activity-header">
+                        <span class="activity-icon">🕵️</span>
+                        <div>
+                            <label class="activity-label">¿Cuál es tu mayor "ladrón de tiempo" (distracción) y qué harás hoy para evitarlo?</label>
+                            <p class="activity-hint">Identificá la distracción y diseñá una estrategia concreta.</p>
+                        </div>
+                    </div>
+                    <textarea class="activity-textarea" placeholder="Ej: Instagram → Dejar el celular en otra habitación..."></textarea>
                 </div>
                 <div class="tab-content" data-tab-content="act5">
-                    <label class="activity-label">¿Cuál es tu principal motivo para querer gestionar mejor tu
-                        tiempo?</label>
-                    <textarea class="activity-textarea"
-                        placeholder="Ej: Tener más tiempo libre para jugar fútbol sin culpa..."></textarea>
+                    <div class="activity-header">
+                        <span class="activity-icon">🎯</span>
+                        <div>
+                            <label class="activity-label">¿Cuál es tu principal motivo para querer gestionar mejor tu tiempo?</label>
+                            <p class="activity-hint">Conectá con tu motivación profunda, más allá de las notas.</p>
+                        </div>
+                    </div>
+                    <textarea class="activity-textarea" placeholder="Ej: Tener más tiempo libre para jugar fútbol sin culpa..."></textarea>
+                </div>
+
+                <!-- NEW EXERCISES -->
+                <div class="tab-content" data-tab-content="act6">
+                    <div class="activity-header">
+                        <span class="activity-icon">📅</span>
+                        <div>
+                            <label class="activity-label">Diseñá tu "Semana Ideal" equilibrando estudio, descanso, relaciones y ocio.</label>
+                            <p class="activity-hint">Pensá en bloques: mañana, tarde y noche. Incluí descansos activos.</p>
+                        </div>
+                    </div>
+                    <textarea class="activity-textarea" placeholder="Lunes mañana: Clases. Tarde: 1h estudio + 30min deporte. Noche: Familia..."></textarea>
+                </div>
+                <div class="tab-content" data-tab-content="act7">
+                    <div class="activity-header">
+                        <span class="activity-icon">🧠</span>
+                        <div>
+                            <label class="activity-label">Diario de Metacognición: ¿Cómo aprendés mejor? ¿Qué estrategias te funcionan y cuáles no?</label>
+                            <p class="activity-hint">Reflexioná sobre tu propio proceso de aprendizaje.</p>
+                        </div>
+                    </div>
+                    <textarea class="activity-textarea" placeholder="Aprendo mejor cuando... Me cuesta concentrarme cuando..."></textarea>
+                </div>
+                <div class="tab-content" data-tab-content="act8">
+                    <div class="activity-header">
+                        <span class="activity-icon">✉️</span>
+                        <div>
+                            <label class="activity-label">Escribí una "Carta a tu Yo del Futuro" con metas para los próximos 6 meses.</label>
+                            <p class="activity-hint">Sé específico/a: ¿qué habrás logrado? ¿cómo te sentirás?</p>
+                        </div>
+                    </div>
+                    <textarea class="activity-textarea" placeholder="Querido yo del futuro: dentro de 6 meses voy a haber logrado..."></textarea>
+                </div>
+                <div class="tab-content" data-tab-content="act9">
+                    <div class="activity-header">
+                        <span class="activity-icon">🪞</span>
+                        <div>
+                            <label class="activity-label">Conectá tu identidad con tus hábitos: "Soy una persona que..."</label>
+                            <p class="activity-hint">Basado en Hábitos Atómicos: el cambio empieza por quién querés ser, no solo por lo que querés lograr.</p>
+                        </div>
+                    </div>
+                    <textarea class="activity-textarea" placeholder="Soy una persona que se organiza antes de dormir. Soy alguien que prioriza su salud..."></textarea>
+                </div>
+                <div class="tab-content" data-tab-content="act10">
+                    <div class="activity-header">
+                        <span class="activity-icon">🤖</span>
+                        <div>
+                            <label class="activity-label">Simulador de Decisiones con IA</label>
+                            <p class="activity-hint">Describí una situación donde tenés que tomar una decisión sobre cómo usar tu tiempo. La IA te dará feedback sobre tu razonamiento.</p>
+                        </div>
+                    </div>
+                    <textarea id="simulatorInput" class="activity-textarea" placeholder="Ej: Tengo un examen el viernes pero mis amigos me invitan a salir el miércoles. ¿Qué decisión debería tomar y por qué?"></textarea>
+                    <button id="simulateBtn" class="btn btn-secondary mt-16">
+                        <span class="material-symbols-outlined">smart_toy</span>
+                        Simular con IA
+                    </button>
+                    <div id="simulatorResult" class="simulator-result"></div>
                 </div>
 
                 <div class="flex justify-between items-center mt-24">
@@ -252,40 +402,122 @@
             </div>
         </section>
 
-        <!-- QA SECTION -->
-        <section id="grokResults" class="section container">
+        <!-- QA SECTION — 50/50 LAYOUT -->
+        <section id="grokResults" class="section container reveal-section">
             <div class="section-title">
                 <span class="material-symbols-outlined card-icon-purple">psychology</span>
                 Taller de Autogestión
             </div>
-            <p class="section-subtitle">Reflexiona y recibe feedback personalizado para mejorar tu aprendizaje.</p>
+            <p class="section-subtitle">Reflexioná sobre cada punto y recibí feedback personalizado de la IA al costado.</p>
 
-            <div class="card-grid">
+            <div class="qa-grid">
                 <!-- Question 1 -->
                 <div class="qa-card">
-                    <div class="qa-num">1</div>
-                    <div class="qa-label">¿Cómo manejas la frustración cuando los tiempos no se cumplen?</div>
+                    <div class="qa-header">
+                        <div class="qa-num">1</div>
+                        <div class="qa-label">¿Cómo manejas la frustración cuando los tiempos no se cumplen?</div>
+                    </div>
                     <div class="qa-row">
-                        <textarea class="qa-textarea" placeholder="Escribí tu reflexión..."></textarea>
-                        <div class="qa-feedback"></div>
+                        <div class="qa-input-col">
+                            <textarea class="qa-textarea" placeholder="Escribí tu reflexión..."></textarea>
+                            <button class="btn btn-analyze" onclick="analyzeSingle(this)">
+                                <span class="material-symbols-outlined">psychology</span> Analizar
+                            </button>
+                        </div>
+                        <div class="qa-feedback-col">
+                            <div class="qa-feedback show placeholder">
+                                <span class="material-symbols-outlined">chat_bubble_outline</span>
+                                <span>Escribí tu reflexión y hacé clic en "Analizar" para recibir feedback de la IA.</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
+
                 <!-- Question 2 -->
                 <div class="qa-card">
-                    <div class="qa-num">2</div>
-                    <div class="qa-label">¿Qué dificultades encontraste en el proceso de aprendizaje hoy?</div>
+                    <div class="qa-header">
+                        <div class="qa-num">2</div>
+                        <div class="qa-label">¿Qué dificultades encontraste en el proceso de aprendizaje hoy?</div>
+                    </div>
                     <div class="qa-row">
-                        <textarea class="qa-textarea" placeholder="Escribí tu reflexión..."></textarea>
-                        <div class="qa-feedback"></div>
+                        <div class="qa-input-col">
+                            <textarea class="qa-textarea" placeholder="Escribí tu reflexión..."></textarea>
+                            <button class="btn btn-analyze" onclick="analyzeSingle(this)">
+                                <span class="material-symbols-outlined">psychology</span> Analizar
+                            </button>
+                        </div>
+                        <div class="qa-feedback-col">
+                            <div class="qa-feedback show placeholder">
+                                <span class="material-symbols-outlined">chat_bubble_outline</span>
+                                <span>Escribí tu reflexión y hacé clic en "Analizar" para recibir feedback de la IA.</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
+
                 <!-- Question 3 -->
                 <div class="qa-card">
-                    <div class="qa-num">3</div>
-                    <div class="qa-label">¿Cómo podrías mejorar tu método de estudio para la siguiente fase?</div>
+                    <div class="qa-header">
+                        <div class="qa-num">3</div>
+                        <div class="qa-label">¿Cómo podrías mejorar tu método de estudio para la siguiente fase?</div>
+                    </div>
                     <div class="qa-row">
-                        <textarea class="qa-textarea" placeholder="Escribí tu reflexión..."></textarea>
-                        <div class="qa-feedback"></div>
+                        <div class="qa-input-col">
+                            <textarea class="qa-textarea" placeholder="Escribí tu reflexión..."></textarea>
+                            <button class="btn btn-analyze" onclick="analyzeSingle(this)">
+                                <span class="material-symbols-outlined">psychology</span> Analizar
+                            </button>
+                        </div>
+                        <div class="qa-feedback-col">
+                            <div class="qa-feedback show placeholder">
+                                <span class="material-symbols-outlined">chat_bubble_outline</span>
+                                <span>Escribí tu reflexión y hacé clic en "Analizar" para recibir feedback de la IA.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Question 4 — NEW -->
+                <div class="qa-card">
+                    <div class="qa-header">
+                        <div class="qa-num">4</div>
+                        <div class="qa-label">¿Qué hábito nuevo querés incorporar y cómo lo conectás con tu identidad?</div>
+                    </div>
+                    <div class="qa-row">
+                        <div class="qa-input-col">
+                            <textarea class="qa-textarea" placeholder="Escribí tu reflexión..."></textarea>
+                            <button class="btn btn-analyze" onclick="analyzeSingle(this)">
+                                <span class="material-symbols-outlined">psychology</span> Analizar
+                            </button>
+                        </div>
+                        <div class="qa-feedback-col">
+                            <div class="qa-feedback show placeholder">
+                                <span class="material-symbols-outlined">chat_bubble_outline</span>
+                                <span>Escribí tu reflexión y hacé clic en "Analizar" para recibir feedback de la IA.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Question 5 — NEW -->
+                <div class="qa-card">
+                    <div class="qa-header">
+                        <div class="qa-num">5</div>
+                        <div class="qa-label">Describí una situación donde postergaste algo importante. ¿Qué harías diferente hoy?</div>
+                    </div>
+                    <div class="qa-row">
+                        <div class="qa-input-col">
+                            <textarea class="qa-textarea" placeholder="Escribí tu reflexión..."></textarea>
+                            <button class="btn btn-analyze" onclick="analyzeSingle(this)">
+                                <span class="material-symbols-outlined">psychology</span> Analizar
+                            </button>
+                        </div>
+                        <div class="qa-feedback-col">
+                            <div class="qa-feedback show placeholder">
+                                <span class="material-symbols-outlined">chat_bubble_outline</span>
+                                <span>Escribí tu reflexión y hacé clic en "Analizar" para recibir feedback de la IA.</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -310,14 +542,14 @@
 
                 <button id="analyzeBtn" class="btn btn-secondary" style="padding: 14px 32px; font-size: 1rem;">
                     <span class="material-symbols-outlined">psychology</span>
-                    Analizar Reflexiones
+                    Analizar Todas las Reflexiones
                 </button>
             </div>
         </section>
     </main>
 
     <!-- FOOTER -->
-    <footer class="site-footer">
+    <footer class="site-footer reveal-section">
         <img src="assets/logo.png" alt="Logo Colegio Pedro Goyena" class="footer-logo">
         <p class="footer-text">© 2026 Colegio Pedro Goyena · Proyecto Desafíos</p>
         <p class="footer-text" style="opacity: 0.6; font-size: 0.7rem; margin-top: 4px;">Pausa para pensar: El

@@ -17,11 +17,12 @@ GESTIÓN DEL TIEMPO - CONCEPTOS FUNDAMENTALES:
 5. TIEMPOS DE DOLOR: Los momentos difíciles y de incomodidad son necesarios para el crecimiento. Aprender a tolerar la frustración y la demora de la gratificación es clave.
 6. AUTOGESTIÓN: Ser protagonista de tu propio tiempo. Evitar la procrastinación. Reflexionar sobre cómo aprendemos (metacognición).
 7. EQUILIBRIO: Gestionar tiempo no es solo producir, sino equilibrar estudio, descanso, relaciones y crecimiento personal.
+8. IDENTIDAD Y HÁBITOS: El cambio más duradero empieza por la identidad ("soy una persona organizada") y no solo por los resultados.
 
 INSTRUCCIONES:
 - Evalúa si la respuesta del alumno demuestra comprensión de estos conceptos.
 - Responde SIEMPRE en español.
-- Para cada pregunta que evalúes, comienza con uno de estos marcadores:
+- Comienza con uno de estos marcadores:
   ✅ EXCELENTE: (si la respuesta está bien fundamentada)
   ⚠️ AMPLIAR: (si la respuesta es correcta pero superficial)
   💡 SUGERENCIA: (si la respuesta necesita orientación)
@@ -86,6 +87,64 @@ function initTabs() {
     });
 }
 
+// ── Hero Particles ─────────────────────────────────
+function initParticles() {
+    const container = document.querySelector('.hero-particles');
+    if (!container) return;
+
+    for (let i = 0; i < 30; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'hero-particle';
+        particle.style.left = Math.random() * 100 + '%';
+        particle.style.top = (60 + Math.random() * 40) + '%';
+        particle.style.animationDuration = (5 + Math.random() * 8) + 's';
+        particle.style.animationDelay = (Math.random() * 8) + 's';
+        particle.style.width = (2 + Math.random() * 4) + 'px';
+        particle.style.height = particle.style.width;
+        container.appendChild(particle);
+    }
+}
+
+// ── Scroll Reveal ─────────────────────────────────
+function initScrollReveal() {
+    const sections = document.querySelectorAll('.reveal-section');
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('revealed');
+                observer.unobserve(entry.target);
+            }
+        });
+    }, {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    });
+
+    sections.forEach(section => observer.observe(section));
+}
+
+// ── 3D Parallax on Mouse Move ─────────────────────
+function initParallax() {
+    const shapes = document.querySelectorAll('.shape');
+    if (shapes.length === 0) return;
+
+    let ticking = false;
+    document.addEventListener('mousemove', (e) => {
+        if (ticking) return;
+        ticking = true;
+        requestAnimationFrame(() => {
+            const x = (e.clientX / window.innerWidth - 0.5) * 2;
+            const y = (e.clientY / window.innerHeight - 0.5) * 2;
+            shapes.forEach((shape, i) => {
+                const factor = (i + 1) * 8;
+                shape.style.transform = `translate3d(${x * factor}px, ${y * factor}px, 0)`;
+            });
+            ticking = false;
+        });
+    });
+}
+
 // ── Progress Rings ─────────────────────────────────
 function setRing(id, pct) {
     const circle = document.getElementById(id);
@@ -115,11 +174,81 @@ function updateProgressRings() {
     if (el2) el2.textContent = actPct + '%';
 }
 
-// ── Call Gemini API ──────────────────────────────────
-async function analyzeReflections() {
-    // Note: The key is now handled by our backend (server.js)
+// ── Analyze SINGLE Question with AI ─────────────────
+async function analyzeSingle(button) {
+    const card = button.closest('.qa-card');
+    if (!card) return;
 
-    // Collect answers
+    const textarea = card.querySelector('.qa-textarea');
+    const feedbackEl = card.querySelector('.qa-feedback');
+    const label = card.querySelector('.qa-label')?.textContent || 'Pregunta';
+    const answer = textarea?.value?.trim() || '';
+
+    if (answer.length < 5) {
+        showToast('Escribí al menos una reflexión antes de analizar', 'error');
+        textarea?.focus();
+        return;
+    }
+
+    // UI: loading state
+    button.disabled = true;
+    const originalHTML = button.innerHTML;
+    button.innerHTML = '<span class="spinner"></span>&nbsp;Analizando...';
+
+    try {
+        const resp = await fetch('/api/analyze', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                contents: [{
+                    parts: [{
+                        text: `${SYSTEM_PROMPT}\n\nAnaliza la siguiente respuesta de un alumno sobre Gestión del Tiempo. Da feedback breve (máximo 3 oraciones). Usa el marcador ✅ EXCELENTE, ⚠️ AMPLIAR o 💡 SUGERENCIA al inicio:\n\nPREGUNTA: ${label}\nRESPUESTA: ${answer}`
+                    }]
+                }],
+                generationConfig: {
+                    temperature: 0.6,
+                    maxOutputTokens: 500,
+                }
+            })
+        });
+
+        const data = await resp.json();
+
+        if (!resp.ok) {
+            const errorMsg = data.error?.message || `Error ${resp.status}`;
+            throw new Error(errorMsg);
+        }
+
+        const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+
+        // Parse and display feedback
+        if (text && feedbackEl) {
+            const cleanFb = text.trim();
+            let cls = 'suggest';
+            let badge = '💡 Sugerencia';
+            if (cleanFb.includes('✅') || cleanFb.toLowerCase().includes('excelente')) {
+                cls = 'good'; badge = '✅ Excelente';
+            } else if (cleanFb.includes('⚠️') || cleanFb.toLowerCase().includes('ampliar')) {
+                cls = 'improve'; badge = '⚠️ Ampliar';
+            }
+
+            const displayText = cleanFb.replace(/^[✅⚠️💡]\s*(EXCELENTE|AMPLIAR|SUGERENCIA)[:\s]*/i, '').replace(/\n/g, '<br>');
+            feedbackEl.innerHTML = `<div class="feedback-badge">${badge}</div>${displayText}`;
+            feedbackEl.className = `qa-feedback ${cls} has-feedback show`;
+        }
+
+        showToast('✅ Feedback recibido', 'success');
+    } catch (err) {
+        console.error('API Error:', err);
+        showToast('Error: ' + err.message, 'error');
+    } finally {
+        button.disabled = false;
+        button.innerHTML = originalHTML;
+    }
+}
+
+// ── Analyze ALL Questions (bulk) ──────────────────
+async function analyzeReflections() {
     const cards = document.querySelectorAll('.qa-card');
     let allAnswers = '';
     let hasContent = false;
@@ -138,10 +267,7 @@ async function analyzeReflections() {
 
     const analyzeBtn = document.getElementById('analyzeBtn');
     analyzeBtn.disabled = true;
-    analyzeBtn.innerHTML = '<span class="spinner"></span>&nbsp;Analizando...';
-
-    // Hide all previous feedbacks
-    document.querySelectorAll('.qa-feedback').forEach(f => { f.classList.remove('show'); f.textContent = ''; });
+    analyzeBtn.innerHTML = '<span class="spinner"></span>&nbsp;Analizando todas...';
 
     try {
         const resp = await fetch('/api/analyze', {
@@ -150,12 +276,12 @@ async function analyzeReflections() {
             body: JSON.stringify({
                 contents: [{
                     parts: [{
-                        text: `${SYSTEM_PROMPT}\n\nAnaliza las siguientes respuestas de un alumno sobre Gestión del Tiempo. Para cada pregunta, da feedback breve (máximo 3 oraciones). Usa el marcador ✅ EXCELENTE, ⚠️ AMPLIAR o 💡 SUGERENCIA al inicio de cada feedback:\n${allAnswers}`
+                        text: `${SYSTEM_PROMPT}\n\nAnaliza las siguientes respuestas de un alumno sobre Gestión del Tiempo. Para cada pregunta, da feedback breve (máximo 3 oraciones). Usa el marcador ✅ EXCELENTE, ⚠️ AMPLIAR o 💡 SUGERENCIA al inicio de cada feedback. Separa cada feedback con "PREGUNTA X:" al inicio:\n${allAnswers}`
                     }]
                 }],
                 generationConfig: {
                     temperature: 0.6,
-                    maxOutputTokens: 1400,
+                    maxOutputTokens: 2000,
                 }
             })
         });
@@ -167,47 +293,37 @@ async function analyzeReflections() {
             throw new Error(errorMsg);
         }
 
-        // Gemini response parsing: data.candidates[0].content.parts[0].text
         const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
-
-        // Parse feedback per question
         parseFeedback(text, cards);
         showToast('✅ Análisis completado', 'success');
-        document.getElementById('grokResults')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
     } catch (err) {
         console.error('API Error:', err);
         showToast('Error: ' + err.message, 'error');
     } finally {
         analyzeBtn.disabled = false;
-        analyzeBtn.innerHTML = '<span class="material-symbols-outlined">psychology</span>&nbsp;Analizar Reflexiones';
+        analyzeBtn.innerHTML = '<span class="material-symbols-outlined">psychology</span>&nbsp;Analizar Todas las Reflexiones';
     }
 }
 
 function parseFeedback(text, cards) {
-    // Split by PREGUNTA markers or numbered sections
     const blocks = text.split(/(?=PREGUNTA\s*\d+|^\d+[\.\):])/mi);
 
-    // Try to map blocks to cards
     let feedbacks = [];
     if (blocks.length > 1) {
         feedbacks = blocks.filter(b => b.trim()).slice(0, cards.length);
     } else {
-        // fallback: split by double newlines
         feedbacks = text.split(/\n{2,}/).filter(b => b.trim()).slice(0, cards.length);
     }
 
-    // Assign to cards
     cards.forEach((card, i) => {
         const fb = feedbacks[i];
         const fbEl = card.querySelector('.qa-feedback');
-        if (!fbEl) return;
-        if (!fb) return;
+        if (!fbEl || !fb) return;
 
         const cleanFb = fb.replace(/^(PREGUNTA\s*\d+[:\s]*)/i, '').trim();
         if (!cleanFb) return;
 
-        // Determine type from marker
         let cls = 'suggest';
         let badge = '💡 Sugerencia';
         if (cleanFb.includes('✅') || cleanFb.toLowerCase().includes('excelente')) {
@@ -217,13 +333,86 @@ function parseFeedback(text, cards) {
         }
 
         fbEl.innerHTML = `<div class="feedback-badge">${badge}</div>${cleanFb.replace(/^[✅⚠️💡]\s*(EXCELENTE|AMPLIAR|SUGERENCIA)[:\s]*/i, '').replace(/\n/g, '<br>')}`;
-        fbEl.className = `qa-feedback ${cls} show`;
+        fbEl.className = `qa-feedback ${cls} has-feedback show`;
     });
+}
+
+// ── Simulator (uses second AI endpoint or same) ────
+async function runSimulator() {
+    const input = document.getElementById('simulatorInput');
+    const result = document.getElementById('simulatorResult');
+    const btn = document.getElementById('simulateBtn');
+
+    if (!input || !result || !btn) return;
+
+    const scenario = input.value.trim();
+    if (scenario.length < 10) {
+        showToast('Describí una situación más detallada para simular', 'error');
+        input.focus();
+        return;
+    }
+
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span>&nbsp;Simulando...';
+    result.className = 'simulator-result';
+    result.style.display = 'none';
+
+    try {
+        const resp = await fetch('/api/simulate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                contents: [{
+                    parts: [{
+                        text: `Eres un coach de gestión del tiempo para estudiantes secundarios. Un alumno te presenta esta situación donde debe tomar una decisión:
+
+"${scenario}"
+
+Analiza la situación usando los conceptos de:
+- Matriz de Eisenhower (urgente vs importante)
+- Hábitos Atómicos (las 4 leyes)
+- Equilibrio entre estudio y vida personal
+- Facultades de la persona (inteligencia, voluntad, afectividad)
+
+Da un análisis breve (máximo 5 oraciones) con:
+1. 🎯 Tu recomendación
+2. 📊 Cómo clasificarías esta decisión en la Matriz de Eisenhower
+3. 💡 Un consejo práctico basado en Hábitos Atómicos
+
+Responde en español, de forma motivadora y respetuosa.`
+                    }]
+                }],
+                generationConfig: {
+                    temperature: 0.7,
+                    maxOutputTokens: 600,
+                }
+            })
+        });
+
+        const data = await resp.json();
+
+        if (!resp.ok) {
+            throw new Error(data.error?.message || `Error ${resp.status}`);
+        }
+
+        const text = data.candidates?.[0]?.content?.parts?.[0]?.text || 'No se pudo generar una respuesta.';
+        result.innerHTML = text.replace(/\n/g, '<br>');
+        result.className = 'simulator-result success show';
+        showToast('🤖 Simulación completada', 'success');
+
+    } catch (err) {
+        console.error('Simulator Error:', err);
+        showToast('Error en simulador: ' + err.message, 'error');
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<span class="material-symbols-outlined">smart_toy</span>&nbsp;Simular con IA';
+    }
 }
 
 // ── PDF Generation ────────────────────────────────
 async function downloadPDF() {
     const nombre = document.getElementById('studentName')?.value?.trim();
+    const curso = document.getElementById('studentCurso')?.value?.trim() || '';
     const turno = document.getElementById('studentTurno')?.value;
 
     if (!nombre) {
@@ -287,7 +476,8 @@ async function downloadPDF() {
         doc.setFont('helvetica', 'normal');
         doc.setFontSize(9);
         doc.setTextColor(...grayText);
-        doc.text(`Turno: ${turnoLabel}`, marginL + 6, y + 14);
+        const infoLine = `Turno: ${turnoLabel}` + (curso ? ` · Curso: ${curso}` : '');
+        doc.text(infoLine, marginL + 6, y + 14);
         y += 26;
 
         // ── Section: Resumen de Conceptos ──
@@ -306,6 +496,7 @@ async function downloadPDF() {
             ['Matriz de Eisenhower', 'Urgente+Importante: hazlo ya. Importante+No urgente: agéndalo. Urgente+No importante: delégalo.'],
             ['Hábitos Atómicos', '4 Leyes: Obvio → Atractivo → Sencillo → Satisfactorio. Cambios pequeños, resultados extraordinarios.'],
             ['Facultades', 'Inteligencia (conocer), Voluntad (decidir), Afectividad (sentir). Las tres trabajan juntas.'],
+            ['Identidad', 'El cambio duradero empieza por tu identidad: "Soy una persona organizada", no solo "quiero organizarme".'],
         ];
         concepts.forEach(([title, desc]) => {
             checkPage(16);
@@ -396,7 +587,7 @@ async function downloadPDF() {
                 y += 4.8;
             });
 
-            if (fb) {
+            if (fb && !fb.includes('Escribí tu reflexión')) {
                 checkPage(10);
                 const fbClean = fb.replace(/[✅⚠️💡]/g, '').substring(0, 120);
                 doc.setFont('helvetica', 'italic');
@@ -458,6 +649,9 @@ document.addEventListener('DOMContentLoaded', () => {
     initTheme();
     initAccordions();
     initTabs();
+    initParticles();
+    initScrollReveal();
+    initParallax();
 
     // Theme toggle
     document.getElementById('themeToggle')?.addEventListener('click', toggleTheme);
@@ -465,8 +659,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // PDF
     document.getElementById('pdfBtn')?.addEventListener('click', downloadPDF);
 
-    // IA analyze
+    // IA analyze all
     document.getElementById('analyzeBtn')?.addEventListener('click', analyzeReflections);
+
+    // Simulator
+    document.getElementById('simulateBtn')?.addEventListener('click', runSimulator);
 
     // Progress rings (init at 0)
     setRing('ringProgress', 0);
