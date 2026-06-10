@@ -4,9 +4,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ESI | Proyecto Desafíos</title>
+    <title>Taller de ESI | Proyecto Desafíos</title>
     <meta name="description"
-        content="Plataforma educativa interactiva sobre ESI, ética y construcción de identidad. Proyecto Desafíos - Colegio Pedro Goyena.">
+        content="Plataforma educativa interactiva - Taller de ESI y construcción de identidad. Proyecto Desafíos - Colegio Pedro Goyena.">
 
     <!-- CSS -->
     <link rel="stylesheet" href="styles.css">
@@ -31,7 +31,7 @@
     <header class="site-header">
         <div class="header-inner">
             <img src="assets/logo.png" alt="Logo Colegio Pedro Goyena" class="header-logo">
-            <h1 class="header-title">ESI <span>& Ética</span></h1>
+            <h1 class="header-title">Taller de <span>ESI</span></h1>
 
             <div class="header-fields">
                 <input type="text" id="studentName" class="header-input" placeholder="Nombre completo...">
@@ -57,26 +57,35 @@
         <!-- HERO SECTION -->
         <section class="hero reveal-section">
             <div class="hero-particles" aria-hidden="true"></div>
-            <div class="hero-inner">
-                <div class="hero-badge">
-                    <span class="material-symbols-outlined">verified</span>
-                    Proyecto Desafíos
+            <div class="hero-inner hero-grid">
+                <!-- LOGO SIDE (1/3) -->
+                <div class="hero-logo-side">
+                    <img src="assets/logo.png" alt="Logo Colegio Pedro Goyena" class="hero-logo-3d">
                 </div>
-                <h1>Conócete a ti mismo,<br><span>Elige tu Libertad</span></h1>
-                <p>Bienvenido/a, <span id="greetingName">Alumno/a</span>. Esta plataforma te invita a reflexionar sobre
-                    tus decisiones, tu identidad y la construcción de tu proyecto de vida desde la ESI.</p>
-                <div class="hero-stats">
-                    <div class="hero-stat">
-                        <span class="hero-stat-num">10</span>
-                        <span class="hero-stat-label">Actividades</span>
+
+                <!-- CONTENT SIDE (2/3) -->
+                <div class="hero-text-side">
+                    <div class="hero-badge">
+                        <span class="material-symbols-outlined">verified</span>
+                        Proyecto Desafíos
                     </div>
-                    <div class="hero-stat">
-                        <span class="hero-stat-num">5</span>
-                        <span class="hero-stat-label">Reflexiones</span>
-                    </div>
-                    <div class="hero-stat">
-                        <span class="hero-stat-num">IA</span>
-                        <span class="hero-stat-label">Feedback</span>
+                    <h1>Conócete a ti mismo,<br><span>Elige tu Libertad</span></h1>
+                    <p>Bienvenido/a, <span id="greetingName">Alumno/a</span>. Esta plataforma te invita a reflexionar
+                        sobre
+                        tus decisiones, tu identidad y la construcción de tu proyecto de vida desde la ESI.</p>
+                    <div class="hero-stats">
+                        <div class="hero-stat">
+                            <span class="hero-stat-num" data-target="10">0</span>
+                            <span class="hero-stat-label">Actividades</span>
+                        </div>
+                        <div class="hero-stat">
+                            <span class="hero-stat-num" data-target="5">0</span>
+                            <span class="hero-stat-label">Reflexiones</span>
+                        </div>
+                        <div class="hero-stat">
+                            <span class="hero-stat-num" data-target="IA">IA</span>
+                            <span class="hero-stat-label">Feedback</span>
+                        </div>
                     </div>
                 </div>
             </div>

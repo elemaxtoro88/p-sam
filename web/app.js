@@ -1,12 +1,12 @@
 /* ================================================
-   APP.JS — ESI & Ética | Proyecto Desafíos
+   APP.JS — Taller de ESI | Proyecto Desafíos
    ================================================ */
 
 // ── Constants ─────────────────────────────────────
 const STORAGE_KEY_THEME = 'desafios-theme';
 
 // Asistente context
-const SYSTEM_PROMPT = `Eres un asistente educativo del Proyecto Desafíos, especializado en ESI (Educación Sexual Integral) y Ética. 
+const SYSTEM_PROMPT = `Eres un asistente educativo del Proyecto Desafíos, especializado en el Taller de ESI (Educación Sexual Integral). 
 Analiza las respuestas de los alumnos basándote en estos conceptos clave:
 
 1. LIBERTAD vs CAPRICHO (Andrés Luetich): La libertad es la capacidad de elegir lo que nos acerca a metas a largo plazo, no el impulso inmediato.
@@ -462,7 +462,7 @@ async function downloadPDF() {
         doc.setTextColor(255, 255, 255);
         doc.setFont('helvetica', 'bold');
         doc.setFontSize(15);
-        doc.text('ESI & Ética · Proyecto Desafíos', marginL, 14);
+        doc.text('Taller de ESI · Proyecto Desafíos', marginL, 14);
         doc.setFontSize(9);
         doc.setFont('helvetica', 'normal');
         doc.text('Colegio Pedro Goyena', marginL, 22);
@@ -622,13 +622,13 @@ async function downloadPDF() {
             doc.setTextColor(255, 255, 255);
             doc.setFont('helvetica', 'normal');
             doc.setFontSize(7);
-            doc.text('Colegio Pedro Goyena · Proyecto Desafíos · ESI & Ética', marginL, pageH - 4);
+            doc.text('Colegio Pedro Goyena · Proyecto Desafíos · Taller de ESI', marginL, pageH - 4);
             doc.text(`Pág. ${pg} / ${totalPages}`, pageW - 25, pageH - 4);
         }
 
         // Save
         const safeName = nombre.replace(/[^a-zA-ZáéíóúñÁÉÍÓÚÑ\s]/g, '').trim().replace(/\s+/g, '_');
-        doc.save(`${safeName}_${turno}_ESI_Etica.pdf`);
+        doc.save(`${safeName}_${turno}_Taller_ESI.pdf`);
         showToast('📄 PDF descargado correctamente', 'success');
 
     } catch (err) {
@@ -657,6 +657,63 @@ function updateStudentDisplay() {
     if (el) el.textContent = nombre ? nombre : 'Alumno/a';
 }
 
+// ── Animated Number Counter ───────────────────────
+function animateCounters() {
+    const counters = document.querySelectorAll('.hero-stat-num[data-target]');
+    counters.forEach(counter => {
+        const target = counter.dataset.target;
+        const isNum = !isNaN(target);
+        if (!isNum) { counter.textContent = target; return; }
+        const end = parseInt(target);
+        let current = 0;
+        const duration = 1500;
+        const step = Math.max(1, Math.floor(end / (duration / 30)));
+        const timer = setInterval(() => {
+            current += step;
+            if (current >= end) { current = end; clearInterval(timer); }
+            counter.textContent = current;
+        }, 30);
+    });
+}
+
+// ── 3D Tilt Effect on Cards ──────────────────────
+function initCardTilt() {
+    const cards = document.querySelectorAll('.qa-card, .summary-card, .card');
+    cards.forEach(card => {
+        card.addEventListener('mousemove', (e) => {
+            const rect = card.getBoundingClientRect();
+            const x = (e.clientX - rect.left) / rect.width - 0.5;
+            const y = (e.clientY - rect.top) / rect.height - 0.5;
+            card.style.transform = `perspective(800px) rotateY(${x * 6}deg) rotateX(${-y * 6}deg) translateY(-4px)`;
+        });
+        card.addEventListener('mouseleave', () => {
+            card.style.transform = 'perspective(800px) rotateY(0) rotateX(0) translateY(0)';
+            card.style.transition = 'transform 0.5s ease';
+        });
+        card.addEventListener('mouseenter', () => {
+            card.style.transition = 'transform 0.1s ease';
+        });
+    });
+}
+
+// ── Staggered Scroll Reveal ──────────────────────
+function initStaggeredReveal() {
+    const items = document.querySelectorAll('.qa-card, .accordion, .summary-card');
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry, i) => {
+            if (entry.isIntersecting) {
+                entry.target.style.transitionDelay = `${i * 80}ms`;
+                entry.target.classList.add('stagger-revealed');
+                observer.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.05 });
+    items.forEach(item => {
+        item.classList.add('stagger-item');
+        observer.observe(item);
+    });
+}
+
 // ── Init ──────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
     initTheme();
@@ -665,6 +722,17 @@ document.addEventListener('DOMContentLoaded', () => {
     initParticles();
     initScrollReveal();
     initParallax();
+    initCardTilt();
+    initStaggeredReveal();
+
+    // Animated counters on hero reveal
+    const heroObs = new IntersectionObserver((entries) => {
+        entries.forEach(e => {
+            if (e.isIntersecting) { animateCounters(); heroObs.unobserve(e.target); }
+        });
+    }, { threshold: 0.3 });
+    const heroEl = document.querySelector('.hero');
+    if (heroEl) heroObs.observe(heroEl);
 
     // Theme toggle
     document.getElementById('themeToggle')?.addEventListener('click', toggleTheme);
