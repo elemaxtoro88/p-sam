@@ -571,7 +571,7 @@ html.dark .shape {
   border-radius: 16px;
   overflow: hidden;
   box-shadow: 0 15px 45px var(--shadow-color);
-  max-width: 420px;
+  max-width: 504px;
   aspect-ratio: 16 / 9;
   margin: 0 auto;
   background: #000;
