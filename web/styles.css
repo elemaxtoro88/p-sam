@@ -839,6 +839,29 @@ html.dark .shape {
   line-height: 1.5;
 }
 
+.activity-hint {
+  font-size: 0.88rem;
+  color: var(--on-surface-variant);
+  opacity: 0.8;
+  margin-top: 4px;
+}
+
+.activity-guide {
+  margin-top: 14px;
+  padding: 10px 14px;
+  background: var(--surface-container-highest);
+  border-left: 3px solid var(--secondary-container);
+  border-radius: 6px;
+  font-size: 0.82rem;
+  color: var(--on-surface);
+  line-height: 1.4;
+  animation: fadeIn 0.4s ease forwards;
+}
+
+.activity-guide strong {
+  color: var(--secondary-container);
+}
+
 .activity-textarea {
   width: 100%;
   min-height: 100px;
