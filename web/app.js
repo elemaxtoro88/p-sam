@@ -286,7 +286,7 @@ async function analyzeReflections() {
             body: JSON.stringify({
                 contents: [{
                     parts: [{
-                        text: `${SYSTEM_PROMPT}\n\nAnaliza las siguientes respuestas de un alumno sobre Gestión del Tiempo. Para cada pregunta, da feedback breve (máximo 3 oraciones). Usa el marcador ✅ EXCELENTE, ⚠️ AMPLIAR o 💡 SUGERENCIA al inicio de cada feedback. Separa cada feedback con "PREGUNTA X:" al inicio:\n${allAnswers}`
+                        text: `${SYSTEM_PROMPT}\n\nAnaliza las siguientes respuestas de un alumno sobre el Taller de ESI. Para cada pregunta, da un feedback breve (máximo 3 oraciones). Usa el marcador ✅ EXCELENTE, ⚠️ AMPLIAR o 💡 SUGERENCIA al inicio de cada feedback. Separa cada feedback con "PREGUNTA X:" al inicio. \n\nIMPORTANTE: Finaliza tu respuesta con una sección llamada "CONCLUSIÓN GENERAL:" donde resumas el desempeño global del alumno y le des un consejo final motivador.\n\nRespuestas del alumno:\n${allAnswers}`
                     }]
                 }],
                 generationConfig: {
@@ -311,6 +311,17 @@ async function analyzeReflections() {
         parseFeedback(text, cards);
         showToast('✅ Análisis completado', 'success');
 
+        // Update Global Feedback UI
+        const globalFb = document.getElementById('globalFeedback');
+        const globalContent = document.getElementById('globalFeedbackContent');
+        if (globalFb && globalContent) {
+            const conclusionMatch = text.match(/CONCLUSIÓN GENERAL:([\s\S]*)$/i);
+            if (conclusionMatch && conclusionMatch[1]) {
+                globalContent.innerHTML = `<strong>Conclusión General:</strong><br>${conclusionMatch[1].trim().replace(/\n/g, '<br>')}`;
+                globalFb.classList.add('active');
+            }
+        }
+
     } catch (err) {
         console.error('API Error:', err);
         showToast('Error: ' + err.message, 'error');
@@ -321,7 +332,9 @@ async function analyzeReflections() {
 }
 
 function parseFeedback(text, cards) {
-    const blocks = text.split(/(?=PREGUNTA\s*\d+|^\d+[\.\):])/mi);
+    // Remove the general conclusion before splitting questions
+    const cleanText = text.split(/CONCLUSIÓN GENERAL:/i)[0];
+    const blocks = cleanText.split(/(?=PREGUNTA\s*\d+|^\d+[\.\):])/mi);
 
     let feedbacks = [];
     if (blocks.length > 1) {
