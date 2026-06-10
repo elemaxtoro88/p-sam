@@ -1812,3 +1812,58 @@ html.dark .qa-feedback.suggest {
   background: radial-gradient(ellipse at center, rgba(37, 99, 235, 0.03) 0%, transparent 70%);
   pointer-events: none;
 }
+
+/* ---------- Global Feedback Card ---------- */
+.global-feedback-card {
+  flex: 1;
+  min-width: 300px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  padding: 16px 24px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-size: 0.9rem;
+  color: var(--on-surface);
+  line-height: 1.5;
+  box-shadow: 0 8px 32px var(--shadow-color);
+  opacity: 0.6;
+  transition: all 0.5s ease;
+  border-left: 4px solid var(--primary);
+}
+
+.global-feedback-card.active {
+  opacity: 1;
+  transform: scale(1.02);
+  border-left-color: var(--secondary-container);
+  box-shadow: 0 12px 40px rgba(253, 118, 26, 0.15);
+  animation: cardPulse 2s infinite;
+}
+
+.global-feedback-card .material-symbols-outlined {
+  font-size: 2rem;
+  color: var(--secondary-container);
+  flex-shrink: 0;
+}
+
+@keyframes cardPulse {
+
+  0%,
+  100% {
+    box-shadow: 0 12px 40px rgba(253, 118, 26, 0.15);
+  }
+
+  50% {
+    box-shadow: 0 12px 60px rgba(253, 118, 26, 0.25);
+  }
+}
+
+@media (max-width: 768px) {
+  .global-feedback-card {
+    width: 100%;
+    order: -1;
+    /* Show above button on mobile */
+  }
+}
