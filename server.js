@@ -139,7 +139,7 @@ function callGroq(geminiStyleBody, key) {
         const data = JSON.stringify({
             model: 'llama-3.3-70b-versatile',
             messages: [
-                { role: 'system', content: 'Eres un asistente educativo especializado en Gestión del Tiempo del Proyecto Desafíos.' },
+                { role: 'system', content: 'Eres un asistente educativo especializado en ESI (Educación Sexual Integral) y Ética del Proyecto Desafíos. Te basas en los conceptos de Andrés Luetich (libertad a largo plazo vs capricho) y James Clear (Hábitos Atómicos e Identidad). Tu objetivo es ayudar a los alumnos a reflexionar sobre sus decisiones, proactividad y sistemas de hábitos.' },
                 { role: 'user', content: promptText }
             ],
             temperature: 0.6
@@ -193,7 +193,7 @@ function callGrok(geminiStyleBody, key) {
         const data = JSON.stringify({
             model: 'grok-beta',
             messages: [
-                { role: 'system', content: 'Eres un asistente educativo especializado en Gestión del Tiempo del Proyecto Desafíos.' },
+                { role: 'system', content: 'Eres un asistente educativo especializado en ESI (Educación Sexual Integral) y Ética del Proyecto Desafíos. Te basas en los conceptos de Andrés Luetich (libertad a largo plazo vs capricho) y James Clear (Hábitos Atómicos e Identidad). Tu objetivo es ayudar a los alumnos a reflexionar sobre sus decisiones, proactividad y sistemas de hábitos.' },
                 { role: 'user', content: promptText }
             ],
             temperature: 0.6

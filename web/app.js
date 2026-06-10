@@ -1,33 +1,25 @@
 /* ================================================
-   APP.JS — Gestión del Tiempo | Proyecto Desafíos
+   APP.JS — ESI & Ética | Proyecto Desafíos
    ================================================ */
 
 // ── Constants ─────────────────────────────────────
 const STORAGE_KEY_THEME = 'desafios-theme';
 
-// Asistente context — key content from the project summary
-const SYSTEM_PROMPT = `Eres un asistente educativo del Proyecto Desafíos, especializado en Gestión del Tiempo para estudiantes secundarios. 
-Analiza las respuestas de los alumnos basándote en estos conceptos clave del material de estudio:
+// Asistente context
+const SYSTEM_PROMPT = `Eres un asistente educativo del Proyecto Desafíos, especializado en ESI (Educación Sexual Integral) y Ética. 
+Analiza las respuestas de los alumnos basándote en estos conceptos clave:
 
-GESTIÓN DEL TIEMPO - CONCEPTOS FUNDAMENTALES:
-1. PLANIFICACIÓN: Definir metas claras, priorizar tareas, usar agenda y calendario. Sin plan, el tiempo se escapa sin resultados.
-2. MATRIZ DE EISENHOWER: Clasificar tareas en: Urgente+Importante (hazlo ya), Importante+No urgente (agenda), Urgente+No importante (delega), Ni urgente ni importante (elimina).
-3. HÁBITOS ATÓMICOS (James Clear): Cambios pequeños y consistentes generan resultados extraordinarios. Las 4 leyes: hacerlo obvio, atractivo, sencillo y satisfactorio. Identidad → Proceso → Resultado.
-4. FACULTADES DE LA PERSONA: Inteligencia (conocer), Voluntad (querer/decidir), Afectividad (sentir). La gestión del tiempo requiere las tres facultades trabajando juntas.
-5. TIEMPOS DE DOLOR: Los momentos difíciles y de incomodidad son necesarios para el crecimiento. Aprender a tolerar la frustración y la demora de la gratificación es clave.
-6. AUTOGESTIÓN: Ser protagonista de tu propio tiempo. Evitar la procrastinación. Reflexionar sobre cómo aprendemos (metacognición).
-7. EQUILIBRIO: Gestionar tiempo no es solo producir, sino equilibrar estudio, descanso, relaciones y crecimiento personal.
-8. IDENTIDAD Y HÁBITOS: El cambio más duradero empieza por la identidad ("soy una persona organizada") y no solo por los resultados.
+1. LIBERTAD vs CAPRICHO (Andrés Luetich): La libertad es la capacidad de elegir lo que nos acerca a metas a largo plazo, no el impulso inmediato.
+2. PROACTIVIDAD: Tomar el control de la propia vida y decisiones, en lugar de reaccionar a impulsos externos.
+3. SISTEMAS vs METAS (James Clear): Las metas son resultados; los sistemas son procesos. El cambio real ocurre en el sistema.
+4. IDENTIDAD: El cambio más duradero empieza por "quién quiero ser" (identidad) y no solo "qué quiero lograr". Cada acción es un voto por tu identidad.
+5. VOLUNTAD: El fortalecimiento del carácter a través de pequeñas decisiones diarias.
 
 INSTRUCCIONES:
-- Evalúa si la respuesta del alumno demuestra comprensión de estos conceptos.
+- Evalúa si el alumno diferencia libertad de capricho o proactividad de reactividad.
 - Responde SIEMPRE en español.
-- Comienza con uno de estos marcadores:
-  ✅ EXCELENTE: (si la respuesta está bien fundamentada)
-  ⚠️ AMPLIAR: (si la respuesta es correcta pero superficial)
-  💡 SUGERENCIA: (si la respuesta necesita orientación)
-- Luego da 2-3 oraciones de feedback constructivo, mencionando el concepto específico del material.
-- Sé motivador y respetuoso, como un buen docente.`;
+- Marcadores: ✅ EXCELENTE, ⚠️ AMPLIAR, 💡 SUGERENCIA.
+- Feedback breve y motivador (2-3 oraciones).`;
 
 // ── Theme ──────────────────────────────────────────
 function initTheme() {
@@ -386,22 +378,19 @@ async function runSimulator() {
             body: JSON.stringify({
                 contents: [{
                     parts: [{
-                        text: `Eres un coach de gestión del tiempo para estudiantes secundarios. Un alumno te presenta esta situación donde debe tomar una decisión:
+                        text: `Eres un coach de ética y ESI para estudiantes. Un alumno te presenta un dilema o situación de decisión:
 
 "${scenario}"
 
-Analiza la situación usando los conceptos de:
-- Matriz de Eisenhower (urgente vs importante)
-- Hábitos Atómicos (las 4 leyes)
-- Equilibrio entre estudio y vida personal
-- Facultades de la persona (inteligencia, voluntad, afectividad)
+Analiza la situación usando:
+- Libertad vs Capricho (Luetich)
+- Proactividad vs Reactividad
+- Votos de Identidad (James Clear)
 
-Da un análisis breve (máximo 5 oraciones) con:
-1. 🎯 Tu recomendación
-2. 📊 Cómo clasificarías esta decisión en la Matriz de Eisenhower
-3. 💡 Un consejo práctico basado en Hábitos Atómicos
-
-Responde en español, de forma motivadora y respetuosa.`
+Da un análisis breve:
+1. 🎯 Tu recomendación ética
+2. 🏁 Cómo esto afecta su libertad a largo plazo
+3. 💡 Un consejo para fortalecer su proactividad.`
                     }]
                 }],
                 generationConfig: {
@@ -473,7 +462,7 @@ async function downloadPDF() {
         doc.setTextColor(255, 255, 255);
         doc.setFont('helvetica', 'bold');
         doc.setFontSize(15);
-        doc.text('Gestión del Tiempo · Proyecto Desafíos', marginL, 14);
+        doc.text('ESI & Ética · Proyecto Desafíos', marginL, 14);
         doc.setFontSize(9);
         doc.setFont('helvetica', 'normal');
         doc.text('Colegio Pedro Goyena', marginL, 22);
@@ -516,11 +505,11 @@ async function downloadPDF() {
         y += 9;
 
         const concepts = [
-            ['Planificación', 'Definir metas, priorizar tareas y usar agenda. El plan es el mapa hacia tus objetivos.'],
-            ['Matriz de Eisenhower', 'Urgente+Importante: hazlo ya. Importante+No urgente: agéndalo. Urgente+No importante: delégalo.'],
-            ['Hábitos Atómicos', '4 Leyes: Obvio → Atractivo → Sencillo → Satisfactorio. Cambios pequeños, resultados extraordinarios.'],
-            ['Facultades', 'Inteligencia (conocer), Voluntad (decidir), Afectividad (sentir). Las tres trabajan juntas.'],
-            ['Identidad', 'El cambio duradero empieza por tu identidad: "Soy una persona organizada", no solo "quiero organizarme".'],
+            ['Libertad vs Capricho', 'La libertad es elegir lo que nos hace bien a largo plazo. El capricho es esclavo del impulso inmediato.'],
+            ['Proactividad', 'Tomar la iniciativa y elegir nuestra respuesta ante los estímulos del entorno.'],
+            ['Sistemas vs Metas', 'No te enfoques solo en el resultado, sino en el proceso diario que te llevará allí.'],
+            ['Identidad', 'Cada acción es un voto para la persona en la que te quieres convertir.'],
+            ['Voluntad', 'La capacidad de decidir lo correcto por encima de lo fácil o placentero.'],
         ];
         concepts.forEach(([title, desc]) => {
             checkPage(16);
@@ -633,13 +622,13 @@ async function downloadPDF() {
             doc.setTextColor(255, 255, 255);
             doc.setFont('helvetica', 'normal');
             doc.setFontSize(7);
-            doc.text('Colegio Pedro Goyena · Proyecto Desafíos · Gestión del Tiempo', marginL, pageH - 4);
+            doc.text('Colegio Pedro Goyena · Proyecto Desafíos · ESI & Ética', marginL, pageH - 4);
             doc.text(`Pág. ${pg} / ${totalPages}`, pageW - 25, pageH - 4);
         }
 
         // Save
         const safeName = nombre.replace(/[^a-zA-ZáéíóúñÁÉÍÓÚÑ\s]/g, '').trim().replace(/\s+/g, '_');
-        doc.save(`${safeName}_${turno}_GestionTiempo.pdf`);
+        doc.save(`${safeName}_${turno}_ESI_Etica.pdf`);
         showToast('📄 PDF descargado correctamente', 'success');
 
     } catch (err) {
