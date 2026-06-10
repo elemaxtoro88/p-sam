@@ -465,17 +465,37 @@ async function downloadPDF() {
         doc.text('Taller de ESI · Proyecto Desafíos', marginL, 14);
         doc.setFontSize(9);
         doc.setFont('helvetica', 'normal');
-        doc.text('Colegio Pedro Goyena', marginL, 22);
+        doc.text('INSTITUTO SUPERIOR PEDRO GOYENA', marginL, 22);
         doc.text(`Fecha: ${new Date().toLocaleDateString('es-AR', { day: '2-digit', month: 'long', year: 'numeric' })}`, marginL, 29);
 
-        // Turno badge
-        doc.setFillColor(...orange);
-        doc.roundedRect(pageW - 50, 8, 34, 10, 2, 2, 'F');
-        doc.setTextColor(255, 255, 255);
-        doc.setFont('helvetica', 'bold');
-        doc.setFontSize(9);
         const turnoLabel = turno === 'tarde' ? 'Turno Tarde' : 'Turno Mañana';
         doc.text(turnoLabel, pageW - 48, 14.5);
+
+        // ── Rubric Seal (Stamp) ──
+        const progressEl = document.getElementById('ringProgress');
+        let progressVal = 0;
+        if (progressEl) {
+            // Get progress from the text element which is easier
+            const pctText = document.getElementById('ringPct')?.textContent || '0%';
+            progressVal = parseInt(pctText);
+        }
+
+        let rubric = 'Regular';
+        let rubricColor = [186, 26, 26]; // Error/Red
+        if (progressVal >= 90) { rubric = 'EXCELENTE'; rubricColor = [0, 74, 198]; }
+        else if (progressVal >= 70) { rubric = 'MUY BIEN'; rubricColor = [99, 46, 205]; }
+        else if (progressVal >= 40) { rubric = 'BIEN'; rubricColor = [253, 118, 26]; }
+
+        doc.setDrawColor(...rubricColor);
+        doc.setLineWidth(1.5);
+        doc.rect(pageW - 50, 22, 34, 12);
+        doc.setTextColor(...rubricColor);
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(10);
+        const rubricW = doc.getTextWidth(rubric);
+        doc.text(rubric, pageW - 33 - (rubricW / 2), 30);
+        doc.setFontSize(6);
+        doc.text('CALIFICACIÓN', pageW - 33 - (doc.getTextWidth('CALIFICACIÓN') / 2), 26);
 
         y = 46;
 
@@ -600,14 +620,18 @@ async function downloadPDF() {
                 y += 4.8;
             });
 
-            if (fb && !fb.includes('Escribí tu reflexión')) {
-                checkPage(10);
-                const fbClean = fb.replace(/[✅⚠️💡]/g, '').substring(0, 120);
+            if (fb && !fb.includes('Escribí tu reflexión') && !fb.includes('Reflexiona sobre')) {
+                checkPage(12);
+                const fbClean = fb.replace(/[✅⚠️💡]/g, '').replace('Excelente', '').replace('Ampliar', '').replace('Sugerencia', '').trim();
                 doc.setFont('helvetica', 'italic');
                 doc.setFontSize(7.5);
                 doc.setTextColor(...orange);
-                doc.text('Feedback: ' + fbClean, marginL + 3, y);
-                y += 5;
+                const fbLines = doc.splitTextToSize('Feedback: ' + fbClean, contentW - 6);
+                fbLines.forEach(line => {
+                    checkPage(4);
+                    doc.text(line, marginL + 3, y);
+                    y += 4;
+                });
             }
             y += 5;
             y += 4;
@@ -622,7 +646,7 @@ async function downloadPDF() {
             doc.setTextColor(255, 255, 255);
             doc.setFont('helvetica', 'normal');
             doc.setFontSize(7);
-            doc.text('Colegio Pedro Goyena · Proyecto Desafíos · Taller de ESI', marginL, pageH - 4);
+            doc.text('INSTITUTO SUPERIOR PEDRO GOYENA · Proyecto Desafíos · Taller de ESI', marginL, pageH - 4);
             doc.text(`Pág. ${pg} / ${totalPages}`, pageW - 25, pageH - 4);
         }
 
