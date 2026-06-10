@@ -6,20 +6,19 @@
 const STORAGE_KEY_THEME = 'desafios-theme';
 
 // Asistente context
-const SYSTEM_PROMPT = `Eres un asistente educativo del Proyecto Desafíos, especializado en el Taller de ESI (Educación Sexual Integral). 
-Analiza las respuestas de los alumnos basándote en estos conceptos clave:
+const SYSTEM_PROMPT = `Eres un evaluador académico del Taller de ESI, exigente y crítico. 
+Analiza las reflexiones de los alumnos con RIGOR basándote en:
 
-1. LIBERTAD vs CAPRICHO (Andrés Luetich): La libertad es la capacidad de elegir lo que nos acerca a metas a largo plazo, no el impulso inmediato.
-2. PROACTIVIDAD: Tomar el control de la propia vida y decisiones, en lugar de reaccionar a impulsos externos.
-3. SISTEMAS vs METAS (James Clear): Las metas son resultados; los sistemas son procesos. El cambio real ocurre en el sistema.
-4. IDENTIDAD: El cambio más duradero empieza por "quién quiero ser" (identidad) y no solo "qué quiero lograr". Cada acción es un voto por tu identidad.
-5. VOLUNTAD: El fortalecimiento del carácter a través de pequeñas decisiones diarias.
+1. PROFUNDIDAD: ¿El alumno realmente reflexiona o da respuestas genéricas?
+2. LIBERTAD vs CAPRICHO: ¿Diferencia elegir por metas vs impulso inmediato?
+3. PROACTIVIDAD: ¿Muestra iniciativa o es reactivo/víctima del entorno?
+4. IDENTIDAD: ¿Se visualiza como "quien quiere ser" o solo cumple la tarea?
 
-INSTRUCCIONES:
-- Evalúa si el alumno diferencia libertad de capricho o proactividad de reactividad.
-- Responde SIEMPRE en español.
-- Marcadores: ✅ EXCELENTE, ⚠️ AMPLIAR, 💡 SUGERENCIA.
-- Feedback breve y motivador (2-3 oraciones).`;
+REGLAS ESTRICTAS:
+- Si la respuesta es corta, vaga o sin sentido (ej: "no se", "si", "ok"), califica como ⚠️ AMPLIAR y sé crítico.
+- NO des elogios vacíos. Si el trabajo es flojo, indícalo educadamente pero con firmeza.
+- Marcadores: ✅ EXCELENTE (solo si hay profundidad real), 💡 SUGERENCIA (para mejorar), ⚠️ CRÍTICA (para trabajos mediocres o incompletos).
+- Responde siempre en español. Breve, pero muy analítico.`;
 
 // ── Theme ──────────────────────────────────────────
 function initTheme() {
@@ -286,7 +285,15 @@ async function analyzeReflections() {
             body: JSON.stringify({
                 contents: [{
                     parts: [{
-                        text: `${SYSTEM_PROMPT}\n\nAnaliza las siguientes respuestas de un alumno sobre el Taller de ESI. Para cada pregunta, da un feedback breve (máximo 3 oraciones). Usa el marcador ✅ EXCELENTE, ⚠️ AMPLIAR o 💡 SUGERENCIA al inicio de cada feedback. Separa cada feedback con "PREGUNTA X:" al inicio. \n\nIMPORTANTE: Finaliza tu respuesta con una sección llamada "CONCLUSIÓN GENERAL:" donde resumas el desempeño global del alumno y le des un consejo final motivador.\n\nRespuestas del alumno:\n${allAnswers}`
+                        text: `${SYSTEM_PROMPT}\n\nAnaliza las siguientes respuestas de un alumno sobre el Taller de ESI con CRITERIO ESTRICTO. Para cada pregunta, da un feedback breve y crítico. Separa cada feedback con "PREGUNTA X:" al inicio. 
+
+IMPORTANTE: Finaliza tu respuesta con:
+1. Una sección "CONCLUSIÓN GENERAL:" que resuma la actitud y profundidad del alumno.
+2. Una línea final con el formato EXACTO: "VALORACIÓN: [CATEGORIA]"
+   Donde [CATEGORIA] debe ser solo una de estas: EXCELENTE, MUY BIEN, BIEN, REGULAR, INSUFICIENTE.
+   Sé honesto: si el trabajo es de bajo esfuerzo, usa INSUFICIENTE o REGULAR.
+
+Respuestas del alumno:\n${allAnswers}`
                     }]
                 }],
                 generationConfig: {
@@ -315,10 +322,16 @@ async function analyzeReflections() {
         const globalFb = document.getElementById('globalFeedback');
         const globalContent = document.getElementById('globalFeedbackContent');
         if (globalFb && globalContent) {
-            const conclusionMatch = text.match(/CONCLUSIÓN GENERAL:([\s\S]*)$/i);
+            const conclusionMatch = text.match(/CONCLUSIÓN GENERAL:([\s\S]*?)(?=VALORACIÓN:|$)/i);
+            const rubricMatch = text.match(/VALORACIÓN:\s*(EXCELENTE|MUY BIEN|BIEN|REGULAR|INSUFICIENTE)/i);
+
             if (conclusionMatch && conclusionMatch[1]) {
-                globalContent.innerHTML = `<strong>Conclusión General:</strong><br>${conclusionMatch[1].trim().replace(/\n/g, '<br>')}`;
+                globalContent.innerHTML = `<strong>Análisis Global:</strong><br>${conclusionMatch[1].trim().replace(/\n/g, '<br>')}`;
                 globalFb.classList.add('active');
+            }
+
+            if (rubricMatch && rubricMatch[1]) {
+                window.lastAiRubric = rubricMatch[1].toUpperCase();
             }
         }
 
@@ -332,7 +345,7 @@ async function analyzeReflections() {
 }
 
 function parseFeedback(text, cards) {
-    // Remove the general conclusion before splitting questions
+    // Remove the general conclusion and valuation before splitting questions
     const cleanText = text.split(/CONCLUSIÓN GENERAL:/i)[0];
     const blocks = cleanText.split(/(?=PREGUNTA\s*\d+|^\d+[\.\):])/mi);
 
@@ -485,30 +498,42 @@ async function downloadPDF() {
         doc.text(turnoLabel, pageW - 48, 14.5);
 
         // ── Rubric Seal (Stamp) ──
-        const progressEl = document.getElementById('ringProgress');
-        let progressVal = 0;
-        if (progressEl) {
-            // Get progress from the text element which is easier
-            const pctText = document.getElementById('ringPct')?.textContent || '0%';
-            progressVal = parseInt(pctText);
-        }
-
         let rubric = 'Regular';
-        let rubricColor = [186, 26, 26]; // Error/Red
-        if (progressVal >= 90) { rubric = 'EXCELENTE'; rubricColor = [0, 74, 198]; }
-        else if (progressVal >= 70) { rubric = 'MUY BIEN'; rubricColor = [99, 46, 205]; }
-        else if (progressVal >= 40) { rubric = 'BIEN'; rubricColor = [253, 118, 26]; }
+        let rubricColor = [186, 26, 26]; // Red
+
+        // Use AI rubric if available, otherwise fallback to progress
+        if (window.lastAiRubric) {
+            rubric = window.lastAiRubric;
+            if (rubric === 'EXCELENTE') rubricColor = [0, 74, 198]; // Blue
+            else if (rubric === 'MUY BIEN') rubricColor = [99, 46, 205]; // Purple
+            else if (rubric === 'BIEN') rubricColor = [253, 118, 26]; // Orange
+            else if (rubric === 'REGULAR') rubricColor = [100, 110, 130]; // Gray
+            else if (rubric === 'INSUFICIENTE') rubricColor = [186, 26, 26]; // Red
+        } else {
+            const pctText = document.getElementById('ringPct')?.textContent || '0%';
+            const progressVal = parseInt(pctText);
+            if (progressVal >= 90) { rubric = 'EXCELENTE'; rubricColor = [0, 74, 198]; }
+            else if (progressVal >= 70) { rubric = 'MUY BIEN'; rubricColor = [99, 46, 205]; }
+            else if (progressVal >= 45) { rubric = 'BIEN'; rubricColor = [253, 118, 26]; }
+            else { rubric = 'INSUFICIENTE'; rubricColor = [186, 26, 26]; }
+        }
 
         doc.setDrawColor(...rubricColor);
         doc.setLineWidth(1.5);
-        doc.rect(pageW - 50, 22, 34, 12);
+        doc.rect(pageW - 51, 21, 36, 14);
         doc.setTextColor(...rubricColor);
         doc.setFont('helvetica', 'bold');
-        doc.setFontSize(10);
+        doc.setFontSize(ProgressValTextSize(rubric));
         const rubricW = doc.getTextWidth(rubric);
-        doc.text(rubric, pageW - 33 - (rubricW / 2), 30);
+        doc.text(rubric, pageW - 33 - (rubricW / 2), 31);
         doc.setFontSize(6);
         doc.text('CALIFICACIÓN', pageW - 33 - (doc.getTextWidth('CALIFICACIÓN') / 2), 26);
+
+        function ProgressValTextSize(r) {
+            if (r.length > 10) return 7.5;
+            if (r.length > 8) return 9;
+            return 10.5;
+        }
 
         y = 46;
 
